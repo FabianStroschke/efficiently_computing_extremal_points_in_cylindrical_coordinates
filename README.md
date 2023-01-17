@@ -1,0 +1,1 @@
+Matplotlib.pyplot not found error: check that the Pyton version is <3.8?

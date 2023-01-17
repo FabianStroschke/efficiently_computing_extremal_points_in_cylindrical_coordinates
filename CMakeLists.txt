@@ -2,17 +2,32 @@
 cmake_minimum_required (VERSION 3.1)
 project (WIP)
 
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-SET(BUILD_SHARED_LIBS OFF)
+#static compile
+#set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
-#needs to be modified per PC
-#set(MSYS_ROOT "C:/msys64")
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${MSYS_ROOT}/mingw64/cmake/Modules/")
+# find python libraries
+find_package(Python 3.7 EXACT COMPONENTS Interpreter Development NumPy REQUIRED)
+include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
 
-# The main executable
+# populate matplotlib repository
+include(FetchContent)
+FetchContent_Declare(
+        matplotlib
+        GIT_REPOSITORY https://github.com/lava/matplotlib-cpp.git
+        GIT_TAG        f23347fca25219d1c42cbb91608b5556814bf572
+)
+FetchContent_GetProperties(matplotlib)
+if(NOT matplotlib_POPULATED)
+    FetchContent_Populate(matplotlib)
+endif()
+include_directories(SYSTEM ${matplotlib_SOURCE_DIR})
+
+# add executable
 add_executable(main main.cpp)
-set_property(TARGET main PROPERTY CXX_STANDARD 11)
-target_compile_options(main PRIVATE -Wall)
 
-add_subdirectory(./lib/matplotplusplus)
-target_link_libraries(main PUBLIC matplot)
+# link python and numpy
+target_link_libraries(main
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )

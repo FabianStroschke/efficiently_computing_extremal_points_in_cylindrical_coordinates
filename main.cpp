@@ -1,84 +1,58 @@
-#include <matplot/matplot.h>
-#include <random>
-#include <tuple>
-#include <chrono>
-#include <thread>
+#include "matplotlibcpp.h"
+namespace plt = matplotlibcpp;
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>
-generate_data();
+#include <cstdio>
 
 int main() {
-    using namespace matplot;
+    std::vector<int> x;
+    std::vector<int> y;
+    std::vector<int> z;
+    std::vector<int> x2;
+    std::vector<int> y2;
+    std::vector<int> z2;
 
-    auto [x, y, z] = generate_data();
+    for (int i = 0; i<100; i++) {
+        x2.emplace_back(i);
+        y2.emplace_back(i);
+        z2.emplace_back(i);
+        y.emplace_back(std::rand()%100);
+        x.emplace_back(std::rand()%100);
+        z.emplace_back(std::rand()%100);
 
-    std::vector<double> sizes(x.size() / 3, 16);
-    std::fill_n(std::back_inserter(sizes), x.size() / 3, 8);
-    std::fill_n(std::back_inserter(sizes), x.size() / 3, 2);
+    }
+    plt::plot3(x, y,z, {{"linewidth","0.0" }, {"marker", "o"}},1);
 
-    std::vector<double> colors(x.size() / 3, 1);
-    std::fill_n(std::back_inserter(colors), x.size() / 3, 2);
-    std::fill_n(std::back_inserter(colors), x.size() / 3, 4);
+    plt::plot3(x2, y2,z2,{},1);
+
+    plt::draw();
 
 
-    auto f = figure(true);
-    auto ax = axes(f);
-    auto p = ax->scatter3(x, y, z, sizes);
-    f->show();
-    ax->scatter3(x, y, z, sizes,colors);
-    f->show();
-    for(int i= 0;i<100; i++){
-        for(auto &c: sizes){
-            c = i/100;
-        }
-        ax->scatter3(x, y, z, sizes,colors);
-        f->draw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    for (int i = 0; i<100; i++) {
+
+        x2.erase(x2.begin());
+        y2.erase(y2.begin());
+        z2.erase(z2.begin());
+        x.erase(x.begin());
+        y.erase(y.begin());
+        z.erase(z.begin());
+        //y.emplace_back(std::rand()%100);
+        //x.emplace_back(std::rand()%100);
+        //z.emplace_back(std::rand()%100);
+        //x[0] = std::rand()%100;
+        //y[0] = std::rand()%100;
+        //z[0] = std::rand()%100;
+
+        //plt::plot(x, y, "r");
+        //plt::scatter(x, y,z,2.0, {{"color", "black"},{"marker","x"}});
+        //plt::plot3(x, y,z);
+        //plt::scatter(x, y,z,1.0,{},1);
+        plt::pause(0.05);
+        plt::draw();
+        //plt::close();
     }
 
-    return 0;
-}
+    plt::draw();
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>
-generate_data() {
-    using namespace matplot;
-    int n = 16;
-    auto r = iota(-n, 2., n);
-    auto theta = transform(r, [n](double x) { return x / n * pi; });
-    auto phi = transform(r, [n](double x) { return x / n * pi / 2.; });
-    auto sinphi = transform(phi, [](double x) { return sin(x); });
-    auto cosphi = transform(phi, [](double x) { return cos(x); });
-    cosphi.front() = 0;
-    cosphi.back() = 0;
-    auto sintheta = transform(theta, [](double x) { return sin(x); });
-    sintheta.front() = 0;
-    sintheta.back() = 0;
-    auto costheta = transform(theta, [](double x) { return cos(x); });
-    std::vector<std::vector<double>> X(17, std::vector<double>(17, 0.));
-    std::vector<std::vector<double>> Y(17, std::vector<double>(17, 0.));
-    std::vector<std::vector<double>> Z(17, std::vector<double>(17, 0.));
-    for (int i = 0; i < n + 1; ++i) {
-        for (int j = 0; j < n + 1; ++j) {
-            X[i][j] = cosphi[i] * costheta[j];
-            Y[i][j] = cosphi[i] * sintheta[j];
-            Z[i][j] = sinphi[i];
-        }
-    }
-    auto X1d = reshape(X);
-    auto Y1d = reshape(Y);
-    auto Z1d = reshape(Z);
-    std::vector<double> x =
-            concat(concat(transform(X1d, [](double x) { return x * 0.5; }),
-                          transform(X1d, [](double x) { return x * 0.75; })),
-                   X1d);
-    std::vector<double> y =
-            concat(concat(transform(Y1d, [](double y) { return y * 0.5; }),
-                          transform(Y1d, [](double y) { return y * 0.75; })),
-                   Y1d);
-    std::vector<double> z =
-            concat(concat(transform(Z1d, [](double z) { return z * 0.5; }),
-                          transform(Z1d, [](double z) { return z * 0.75; })),
-                   Z1d);
 
-    return std::make_tuple(x, y, z);
+    plt::show();
 }
