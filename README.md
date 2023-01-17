@@ -1,1 +1,2 @@
-Matplotlib.pyplot not found error: check that the Pyton version is <3.8?
+- Matplotlib.pyplot not found error: check that the Pyton version is <3.8?
+- editing the "sccatter plot" see these keywords:https://matplotlib.org/2.1.2/api/_as_gen/matplotlib.pyplot.plot.html
