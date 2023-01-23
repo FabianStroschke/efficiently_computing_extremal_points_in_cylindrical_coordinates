@@ -22,6 +22,8 @@ if(NOT matplotlib_POPULATED)
 endif()
 include_directories(SYSTEM ${matplotlib_SOURCE_DIR})
 
+add_subdirectory(glm)
+
 # add executable
 add_executable(main main.cpp)
 

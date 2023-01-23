@@ -1,58 +1,114 @@
+#include <ctime>
+#include <chrono>
 #include "matplotlibcpp.h"
+#include "glm/glm.hpp"
 namespace plt = matplotlibcpp;
 
-#include <cstdio>
+#define showMatPlot false
+
+
+double graham_scan(glm::vec2 p0, glm::vec2 a, glm::vec2 b){
+    //glm::mat3x3 mat = {{1.0,1.0,1.0},{},{}}
+}
+std::map<double, glm::vec2, std::less<>> generateSortedAngleMap(const std::vector<glm::vec2> &points,const glm::vec2 &fixpoint){
+    std::map<double, glm::vec2, std::less<>> map;
+    glm::vec2 x_axis = glm::vec2(1,0);
+    for(auto &p: points){
+        auto dot_angle = glm::acos(glm::dot(glm::normalize(fixpoint-p),x_axis))*360/(2*M_PI);
+        if(p.y>fixpoint.y){
+            dot_angle = 360-dot_angle;
+        }
+        map.emplace(dot_angle,p);
+    }
+    return map;
+}
 
 int main() {
-    std::vector<int> x;
-    std::vector<int> y;
-    std::vector<int> z;
-    std::vector<int> x2;
-    std::vector<int> y2;
-    std::vector<int> z2;
-
-    for (int i = 0; i<100; i++) {
-        x2.emplace_back(i);
-        y2.emplace_back(i);
-        z2.emplace_back(i);
-        y.emplace_back(std::rand()%100);
-        x.emplace_back(std::rand()%100);
-        z.emplace_back(std::rand()%100);
-
+    std::vector<glm::vec2> points;
+    int sample_size =10000000;
+    int seed = std::time(nullptr);
+    std::srand(seed);
+    //generate point cloud and fixpoint
+    int rand =std::rand();
+    for (int i = 0; i<sample_size; i++) {
+        rand =std::rand();
+        points.emplace_back(sin(rand)*80,cos(rand)*80);
     }
-    plt::plot3(x, y,z, {{"linewidth","0.0" }, {"marker", "o"}},1);
+    glm::vec2 fixPoint = glm::vec2(sin(rand)*100,cos(rand)*100);//(std::rand()%2000)/10.0,(std::rand()%2000)/10.0);
 
-    plt::plot3(x2, y2,z2,{},1);
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    auto map = generateSortedAngleMap(points,fixPoint);
 
+#if showMatPlot
+    //convert vectors for matplot
+    std::vector<float> x1;
+    std::vector<float> y1;
+    x1.emplace_back(fixPoint.x);
+    y1.emplace_back(fixPoint.y);
     plt::draw();
 
+    std::vector<float> x;
+    std::vector<float> y;
+    std::pair<std::vector<float>,std::vector<float>> line;
+    line.first.emplace_back(fixPoint.x);
+    line.first.emplace_back(fixPoint.x);
+    line.second.emplace_back(fixPoint.y);
+    line.second.emplace_back(fixPoint.y);
+#endif
+    //  plt::ion();
+    // plt::plot(x, y, {{"linewidth","0.0" }, {"marker", "o"}});
+    double min =map.begin()->first;
+    double max =map.begin()->first;
+    double last =map.begin()->first;
+    double angle =max-min;
+    for(auto [k,v]: map){
+#if showMatPlot
+        x.emplace_back(v.x);
+        y.emplace_back(v.y);
+        line.first[1]=v.x;
+        line.second[1]=v.y;
+        //std::cout << k<<"\n";
+        plt::clf();
+        plt::ylim(-120,120);
+        plt::xlim(-120,120);
+        plt::plot(x, y, {{"linewidth","0.0" }, {"marker", "x"},{"markersize", "2.5"}});
+        plt::plot(x1,y1,{{"linewidth","0.0" }, {"marker", "o"},{"markerfacecolor","r"},{"markeredgecolor","r"}});
+        plt::plot(line.first,line.second,{{"linewidth","0.5" }});
 
-    for (int i = 0; i<100; i++) {
-
-        x2.erase(x2.begin());
-        y2.erase(y2.begin());
-        z2.erase(z2.begin());
-        x.erase(x.begin());
-        y.erase(y.begin());
-        z.erase(z.begin());
-        //y.emplace_back(std::rand()%100);
-        //x.emplace_back(std::rand()%100);
-        //z.emplace_back(std::rand()%100);
-        //x[0] = std::rand()%100;
-        //y[0] = std::rand()%100;
-        //z[0] = std::rand()%100;
-
-        //plt::plot(x, y, "r");
-        //plt::scatter(x, y,z,2.0, {{"color", "black"},{"marker","x"}});
-        //plt::plot3(x, y,z);
-        //plt::scatter(x, y,z,1.0,{},1);
-        plt::pause(0.05);
         plt::draw();
-        //plt::close();
+        //plt::pause(0.001);
+#endif
+        if(k-last>angle) {
+            angle = k - last;
+            min = last;
+            max = k;
+        }
+        last = k;
     }
-
-    plt::draw();
-
+    if(map.begin()->first-(last-360)>angle) {
+        angle = map.begin()->first-(last-360);
+        min = map.begin()->first;
+        max = last;
+    }
+#if showMatPlot
+    std::pair<std::vector<float>,std::vector<float>> res;
+    res.first.emplace_back(map.find(min)->second.x+(map.find(min)->second.x-fixPoint.x));
+    res.first.emplace_back(fixPoint.x);
+    res.first.emplace_back(map.find(max)->second.x+(map.find(max)->second.x-fixPoint.x));
+    res.second.emplace_back(map.find(min)->second.y+(map.find(min)->second.y-fixPoint.y));
+    res.second.emplace_back(fixPoint.y);
+    res.second.emplace_back(map.find(max)->second.y+(map.find(max)->second.y-fixPoint.y));
+    plt::plot(res.first,res.second,{{"linewidth","1.5" }});
 
     plt::show();
+#endif
+    std::cout << angle << "\n";
+    std::cout << map.find(min)->second.x << "|" << map.find(min)->second.y << "\n";
+    std::cout << map.find(max)->second.x << "|" << map.find(max)->second.y << "\n";
+    std::cout << seed << "\n";
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
 }
