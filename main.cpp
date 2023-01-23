@@ -10,34 +10,37 @@ namespace plt = matplotlibcpp;
 double graham_scan(glm::vec2 p0, glm::vec2 a, glm::vec2 b){
     //glm::mat3x3 mat = {{1.0,1.0,1.0},{},{}}
 }
-std::map<double, glm::vec2, std::less<>> generateSortedAngleMap(const std::vector<glm::vec2> &points,const glm::vec2 &fixpoint){
-    std::map<double, glm::vec2, std::less<>> map;
+std::vector<std::pair<double, glm::vec2>> generateSortedAngleMap(const std::vector<glm::vec2> &points,const glm::vec2 &fixpoint){
+    std::vector<std::pair<double, glm::vec2>> list;
     glm::vec2 x_axis = glm::vec2(1,0);
     for(auto &p: points){
         auto dot_angle = glm::acos(glm::dot(glm::normalize(fixpoint-p),x_axis))*360/(2*M_PI);
         if(p.y>fixpoint.y){
             dot_angle = 360-dot_angle;
         }
-        map.emplace(dot_angle,p);
+        list.emplace_back(dot_angle,p);
     }
-    return map;
+    return list;
 }
 
 int main() {
     std::vector<glm::vec2> points;
-    int sample_size =10000000;
-    int seed = std::time(nullptr);
+    int sample_size =1000000;
+    int seed = 1234;//std::time(nullptr);
     std::srand(seed);
     //generate point cloud and fixpoint
     int rand =std::rand();
     for (int i = 0; i<sample_size; i++) {
-        rand =std::rand();
-        points.emplace_back(sin(rand)*80,cos(rand)*80);
+        points.emplace_back(sin(std::rand()) * 50, cos(std::rand()) * 50);
     }
     glm::vec2 fixPoint = glm::vec2(sin(rand)*100,cos(rand)*100);//(std::rand()%2000)/10.0,(std::rand()%2000)/10.0);
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     auto map = generateSortedAngleMap(points,fixPoint);
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::sort(map.begin(),map.end(),[](std::pair<double, glm::vec2> &a, std::pair<double, glm::vec2> &b) {return a.first > b.first; });
+    end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
 
 #if showMatPlot
     //convert vectors for matplot
@@ -90,8 +93,10 @@ int main() {
         min = map.begin()->first;
         max = last;
     }
+    end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
 #if showMatPlot
-    std::pair<std::vector<float>,std::vector<float>> res;
+   /* std::pair<std::vector<float>,std::vector<float>> res;
     res.first.emplace_back(map.find(min)->second.x+(map.find(min)->second.x-fixPoint.x));
     res.first.emplace_back(fixPoint.x);
     res.first.emplace_back(map.find(max)->second.x+(map.find(max)->second.x-fixPoint.x));
@@ -99,15 +104,21 @@ int main() {
     res.second.emplace_back(fixPoint.y);
     res.second.emplace_back(map.find(max)->second.y+(map.find(max)->second.y-fixPoint.y));
     plt::plot(res.first,res.second,{{"linewidth","1.5" }});
-
+*/
     plt::show();
 #endif
+
+    for(auto [k,v]: map){
+        if(k == min or k == max){
+            std::cout << k << "\n";
+            break;
+        }
+    }
     std::cout << angle << "\n";
-    std::cout << map.find(min)->second.x << "|" << map.find(min)->second.y << "\n";
-    std::cout << map.find(max)->second.x << "|" << map.find(max)->second.y << "\n";
+    std::cout << fixPoint.x << "|" << fixPoint.y << "\n";
     std::cout << seed << "\n";
 
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    end = std::chrono::steady_clock::now();
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;

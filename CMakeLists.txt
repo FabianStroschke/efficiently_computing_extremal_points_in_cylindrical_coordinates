@@ -33,3 +33,6 @@ target_link_libraries(main
         Python::Module
         Python::NumPy
         )
+
+# add executable
+add_executable(gscan graham_scan.cpp)
