@@ -4,8 +4,8 @@
 #include "glm/glm.hpp"
 namespace plt = matplotlibcpp;
 
-#define showMatPlot true
-#define showTimeStamps false
+#define showMatPlot false
+#define showTimeStamps true
 
 struct angleVec2Pair{
     double angle;
@@ -25,7 +25,7 @@ struct Input{
     PointType fixPoint{};
 };
 
-void modifiedGrahamScanVec2(std::vector<glm::vec2> pointCloud, glm::vec2 fixPoint);
+void modifiedGrahamScanVec2(std::vector<glm::vec2> &pointCloud, glm::vec2 &fixPoint);
 
 enum fixPointLocation {FPL_CONVEXHULL, FPL_RANDOM, FPL_USUALLY_INSIDE, FPL_CENTER};
 
@@ -62,7 +62,7 @@ Input<glm::vec2> generateInputVec2(int sample_size, int seed = std::time(nullptr
 
 
 
-void modifiedGrahamScanVec2(std::vector<glm::vec2> pointCloud, glm::vec2 fixPoint) {
+void modifiedGrahamScanVec2(std::vector<glm::vec2> &pointCloud, glm::vec2 &fixPoint) {
 #if showTimeStamps
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -71,6 +71,7 @@ void modifiedGrahamScanVec2(std::vector<glm::vec2> pointCloud, glm::vec2 fixPoin
     std::vector<std::vector<angleVec2Pair>> vectorList(360);
     for(auto &p: pointCloud){
         auto angle = atan2(fixPoint.y-p.y,fixPoint.x-p.x)*180/M_PI+180;
+        if(angle>360)angle=-360;
         vectorList[(int)angle].emplace_back(angle,p);
     }
 
@@ -174,12 +175,9 @@ void modifiedGrahamScanVec2(std::vector<glm::vec2> pointCloud, glm::vec2 fixPoin
 
 
 int main() {
-    int sample_size =100;
+    int sample_size =250000;
     int seed = std::time(nullptr);
-
-    Input<glm::vec2> input = generateInputVec2(sample_size, seed, FPL_RANDOM);
+    Input<glm::vec2> input = generateInputVec2(sample_size, seed, FPL_CONVEXHULL);
     modifiedGrahamScanVec2(input.pointCloud, input.fixPoint); //TODO output solution vectors
 
-
-    std::cout << seed << "\n";
 }
