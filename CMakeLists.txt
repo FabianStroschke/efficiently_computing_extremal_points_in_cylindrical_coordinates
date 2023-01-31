@@ -5,9 +5,20 @@ project (WIP)
 #static compile
 #set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
+# add executables
+add_executable(main main.cpp)
+add_executable(gscan graham_scan.cpp)
+
 # find python libraries
 find_package(Python 3.7 EXACT COMPONENTS Interpreter Development NumPy REQUIRED)
 include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
+
+# link python and numpy
+target_link_libraries(main
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )
 
 # populate matplotlib repository
 include(FetchContent)
@@ -22,17 +33,9 @@ if(NOT matplotlib_POPULATED)
 endif()
 include_directories(SYSTEM ${matplotlib_SOURCE_DIR})
 
+#add glm
 add_subdirectory(glm)
 
-# add executable
-add_executable(main main.cpp)
-
-# link python and numpy
-target_link_libraries(main
-        Python::Python
-        Python::Module
-        Python::NumPy
-        )
-
-# add executable
-add_executable(gscan graham_scan.cpp)
+#add CGAL
+find_package(CGAL REQUIRED COMPONENTS Core)
+target_link_libraries(gscan CGAL::CGAL CGAL::CGAL_Core)

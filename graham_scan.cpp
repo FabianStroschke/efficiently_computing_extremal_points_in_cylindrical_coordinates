@@ -7,6 +7,11 @@
 #include <chrono>
 #include "glm/glm.hpp"
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/ch_graham_andrew.h>
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef K::Point_2 Point_2;
+
 //
 //  main.cpp
 //  ConvexHull
@@ -53,58 +58,32 @@ int main () {
     vector<PointType> lowerCH;
     vector<PointType> upperCH;
 
-    std::vector<PointType> points;
-    int sample_size =1000000;
+    std::vector<PointType> pointList;
+    int sample_size =100000000;
     int seed = 1234;//std::time(nullptr);
     std::srand(seed);
     //generate point cloud and fixpoint
     int rand =std::rand();
     for (int i = 0; i<sample_size; i++) {
-        points.push_back({sin(std::rand()) * 50, cos(std::rand()) * 50});
+        pointList.push_back({sin(std::rand()) * 50, cos(std::rand()) * 50});
     }
     PointType fixPoint = {sin(rand) * 100, cos(rand) * 100};
-    points.push_back(fixPoint);
+    pointList.push_back(fixPoint);
 
-    n_points = points.size();
+    std::vector<Point_2> points;
+    for(auto e: pointList){
+        points.emplace_back(e.x,e.y);
+    }
+    std::vector<Point_2>  out;
+
+
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-    //Sorting points
-    sort(points.data(), points.data() + n_points, sortPoints);
-    end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
-    //Computing upper convex hull
-    upperCH.push_back(points[0]);
-    upperCH.push_back(points[1]);
+    CGAL::ch_graham_andrew( points.begin(), points.end(), std::back_inserter(out) );
 
-    for(int i=2; i<n_points; i++)
-    {
-        while(upperCH.size() > 1 and (!right_turn(upperCH[upperCH.size()-2],upperCH[upperCH.size()-1], points[i])))
-            upperCH.pop_back();
-        upperCH.push_back(points[i]);
-    }
-
-
-    //Computing lower convex hull
-    lowerCH.push_back(points[n_points-1]);
-    lowerCH.push_back(points[n_points-2]);
-
-    for(int i=2; i< n_points; i++)
-    {
-        while(lowerCH.size() > 1 and (!right_turn(lowerCH[lowerCH.size()-2],lowerCH[lowerCH.size()-1], points[n_points-i-1])))
-            lowerCH.pop_back();
-        lowerCH.push_back(points[n_points-i-1]);
-    }
-    end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
-    for(auto &p: upperCH){
-        if(p.x == fixPoint.x and p.y == fixPoint.y){
-            std::cout << fixPoint.x << "|" << fixPoint.y << "\n";
-            break;
-        }
-    }
-    for(auto &p: lowerCH){
-        if(p.x == fixPoint.x and p.y == fixPoint.y){
+    for(auto &p: out){
+        if(p.x() == fixPoint.x and p.y() == fixPoint.y){
             std::cout << fixPoint.x << "|" << fixPoint.y << "\n";
             break;
         }
