@@ -6,9 +6,12 @@ project (WIP)
 #set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 # add executables
-add_executable(main main.cpp)
+add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp)
+target_include_directories(main PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_executable(gscan graham_scan.cpp)
 
+include_directories(include)
 # find python libraries
 find_package(Python 3.7 EXACT COMPONENTS Interpreter Development NumPy REQUIRED)
 include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
@@ -34,7 +37,7 @@ endif()
 include_directories(SYSTEM ${matplotlib_SOURCE_DIR})
 
 #add glm
-add_subdirectory(glm)
+add_subdirectory(external/glm)
 
 #add CGAL
 find_package(CGAL REQUIRED COMPONENTS Core)
