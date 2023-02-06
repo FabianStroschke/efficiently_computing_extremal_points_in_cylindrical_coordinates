@@ -8,6 +8,8 @@
 #include <vector>
 #include <ctime>
 #include "../external/glm/glm.hpp"
+#include "CGALSetup.h"
+
 
 
 enum fixPointLocation {FPL_CONVEXHULL, FPL_RANDOM, FPL_USUALLY_INSIDE, FPL_CENTER};
@@ -17,8 +19,9 @@ struct Input{
     std::vector<PointType> pointCloud;
     PointType fixPoint{};
 };
+template<typename PointType>
+Input<PointType> generateInputVec2(int sample_size, int seed = std::time(nullptr), fixPointLocation hint = FPL_RANDOM, size_t x_dim = 100, size_t y_dim = 100);
 
-Input<glm::vec2> generateInputVec2(int sample_size, int seed = std::time(nullptr),fixPointLocation hint = FPL_RANDOM, size_t x_dim = 100, size_t y_dim = 100);
 
 
 #endif //EXAMPLE_INPUT_GENERATORS_H

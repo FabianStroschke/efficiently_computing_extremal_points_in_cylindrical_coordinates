@@ -3,7 +3,6 @@
 //
 
 #include "modifiedGrahamScan.h"
-#include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 

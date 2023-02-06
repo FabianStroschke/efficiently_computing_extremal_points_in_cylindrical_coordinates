@@ -1,7 +1,6 @@
 #include <ctime>
 #include <chrono>
 #include <fstream>
-#include "matplotlibcpp.h"
 #include "external/glm/glm.hpp"
 #include "include/input_generators.h"
 #include "include/modifiedGrahamScan.h"
@@ -17,7 +16,8 @@ int main() {
 
     for (int i = 0; i < 10; i++) {
         int seed = std::time(nullptr)+i;
-        Input<glm::vec2> input = generateInputVec2(sample_size, seed, FPL_RANDOM);
+        auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_RANDOM);
+
         log << i << ",";
         log_function_time(auto res = modifiedGrahamScanVec2(input.pointCloud, input.fixPoint,false),log); //TODO output solution vectors
         log << "\n";

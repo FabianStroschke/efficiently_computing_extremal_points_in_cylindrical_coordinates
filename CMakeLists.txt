@@ -5,23 +5,12 @@ project (WIP)
 #static compile
 #set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
-# add executables
-add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp)
-target_include_directories(main PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# add include dir
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-add_executable(gscan graham_scan.cpp)
-
-include_directories(include)
 # find python libraries
 find_package(Python 3.7 EXACT COMPONENTS Interpreter Development NumPy REQUIRED)
 include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
-
-# link python and numpy
-target_link_libraries(main
-        Python::Python
-        Python::Module
-        Python::NumPy
-        )
 
 # populate matplotlib repository
 include(FetchContent)
@@ -41,4 +30,17 @@ add_subdirectory(external/glm)
 
 #add CGAL
 find_package(CGAL REQUIRED COMPONENTS Core)
+
+# add executables
+add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp)
+add_executable(gscan graham_scan.cpp src/input_generators.cpp)
+
+#link main
+target_link_libraries(main
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )
+
+#link gscan
 target_link_libraries(gscan CGAL::CGAL CGAL::CGAL_Core)

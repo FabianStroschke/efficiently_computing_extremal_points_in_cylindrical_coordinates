@@ -4,8 +4,9 @@
 
 #include "input_generators.h"
 
-Input<glm::vec2> generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim) {
-    Input<glm::vec2> res;
+template<typename PointType>
+Input<PointType> generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim) {
+    Input<PointType> res;
 
     //generate point cloud and fixpoint
     srand(seed);
@@ -14,17 +15,17 @@ Input<glm::vec2> generateInputVec2(int sample_size, int seed, fixPointLocation h
 
     switch (hint) {
         case FPL_CONVEXHULL:
-            res.fixPoint = glm::vec2(sin(r) * x_dim, cos(r) * y_dim);
+            res.fixPoint = PointType(sin(r) * x_dim, cos(r) * y_dim);
             scale = 0.7;
             break;
         case FPL_RANDOM:
-            res.fixPoint = glm::vec2((float )(rand() % (x_dim * 2)) - x_dim, (float )(rand() % (y_dim * 2)) - y_dim);
+            res.fixPoint = PointType((float )(rand() % (x_dim * 2)) - x_dim, (float )(rand() % (y_dim * 2)) - y_dim);
             break;
         case FPL_USUALLY_INSIDE:
-            res.fixPoint = glm::vec2(sin(r) * x_dim/2, cos(r) * y_dim/2);
+            res.fixPoint = PointType(sin(r) * x_dim/2, cos(r) * y_dim/2);
             break;
         case FPL_CENTER:
-            res.fixPoint = glm::vec2(0,0);
+            res.fixPoint = PointType(0,0);
             break;
     }
 
@@ -34,3 +35,10 @@ Input<glm::vec2> generateInputVec2(int sample_size, int seed, fixPointLocation h
     }
     return res;
 }
+
+
+template
+Input<CGAL::Point_2<CGAL::Epick> > generateInputVec2<CGAL::Point_2<CGAL::Epick> >(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
+
+template
+Input<glm::vec2> generateInputVec2<glm::vec2>(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
