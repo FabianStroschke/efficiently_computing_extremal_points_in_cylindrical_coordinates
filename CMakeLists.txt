@@ -34,6 +34,7 @@ find_package(CGAL REQUIRED COMPONENTS Core)
 # add executables
 add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp)
 add_executable(gscan graham_scan.cpp src/input_generators.cpp)
+add_executable(quadscan quadtree_scan.cpp src/input_generators.cpp)
 
 #link main
 target_link_libraries(main
@@ -44,3 +45,11 @@ target_link_libraries(main
 
 #link gscan
 target_link_libraries(gscan CGAL::CGAL CGAL::CGAL_Core)
+
+#link quadscan
+target_link_libraries(quadscan CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(quadscan
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )
