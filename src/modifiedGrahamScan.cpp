@@ -22,7 +22,7 @@ struct angleVec2Pair{
 std::vector<glm::vec2> modifiedGrahamScanVec2(std::vector<glm::vec2> &pointCloud, glm::vec2 &fixPoint, bool show) {
     std::vector<std::vector<angleVec2Pair>> vectorList(360);
     for(auto &p: pointCloud){
-        auto angle = atan2(fixPoint.y-p.y,fixPoint.x-p.x)*180/M_PI+180;
+        auto angle = atan2(fixPoint.y-p.y,fixPoint.x-p.x)*180/M_PI+180; //TODO: vlt zu p-fixpoint ändern, damit die rotation klarer um den fixpunkt geht
         if(angle>360)angle-=360;
         vectorList[(int)angle].emplace_back(angle,p);
     }
