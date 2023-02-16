@@ -70,14 +70,13 @@ int main () {
                 acos(cosAngle[3])
         };
 
-        //TODO fix index 0 with neg determinant
-        /**NOTE: seems to work without the fix? maybe the cause for the wrong aligned result if the fixpoint is "below" the tree**/
-        int index = 0;
-        for(int i= 1; i<4; i++){
-            if(det[i]>0 and Angle[index]<Angle[i]) index = i;
+          int index = 0;
+        double angle = 0;
+        for(int i= 0; i<4; i++){
+            if(det[i]>0 and angle<Angle[i]) { index = i; angle = Angle[i]; }
         }
 
-        if(minAngle>Angle[index]){
+        if(minAngle>angle){
             return -1;
         }else{
             return index;
