@@ -106,7 +106,7 @@ int main () {
                 double angle2 = acos(cosTheta({input.fixPoint,origin},{input.fixPoint,p}));
                 std::cout << input.fixPoint.x()*p.y() - input.fixPoint.y()*p.x() << std::endl;
 
-                if(angle<angle2){
+                if(angle<angle2 and input.fixPoint.x()*p.y() - input.fixPoint.y()*p.x()>0){
                     angle = angle2;
                     res = &p;
                 }
