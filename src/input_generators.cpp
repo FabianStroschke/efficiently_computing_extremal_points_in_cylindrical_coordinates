@@ -22,7 +22,7 @@ Input<PointType> generateInputVec2(int sample_size, int seed, fixPointLocation h
             res.fixPoint = PointType((float )(rand() % (x_dim * 2)) - x_dim, (float )(rand() % (y_dim * 2)) - y_dim);
             break;
         case FPL_USUALLY_INSIDE:
-            res.fixPoint = PointType(sin(r) * x_dim/2, cos(r) * y_dim/2);
+            res.fixPoint = PointType(sin(r) * x_dim/4, cos(r) * y_dim/4);
             break;
         case FPL_CENTER:
             res.fixPoint = PointType(0,0);
