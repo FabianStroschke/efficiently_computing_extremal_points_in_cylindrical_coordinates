@@ -23,7 +23,7 @@ double cosTheta(Kernel::Vector_2 u,Kernel::Vector_2 v){
 int main () {
     int sample_size =100;
     int seed = 1676392660;//std::time(nullptr);
-    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_RANDOM);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -89,7 +89,7 @@ int main () {
     std::vector<int> quadrantOrder = {0,1,3,2};
 
     auto bbox = quadtree.bbox(quadtree.root());
-    Kernel::Point_2 origin(bbox.xmax()+bbox.xmin()/2,bbox.ymax()+bbox.ymin()/2);
+    Kernel::Point_2 origin((bbox.xmax()+bbox.xmin())/2,(bbox.ymax()+bbox.ymin())/2);
     double angle = 0;
 
     Kernel::Point_2 const *res = nullptr;
