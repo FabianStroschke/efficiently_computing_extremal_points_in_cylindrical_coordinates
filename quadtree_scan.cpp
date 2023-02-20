@@ -246,18 +246,19 @@ Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel:
                 double angle2 = acos(cosTheta(fixToOrigin,{fixPoint,p}));
                 auto fixToP = Kernel::Vector_2(fixPoint,p);
 
-
                 switch (side) {
                     case BS_LEFT:
                         if(angle<angle2 and calcDeterminate(fixToOrigin,fixToP)>0){
                             angle = angle2;
                             res = &p;
                         }
+                        break;
                     case BS_RIGHT:
                         if(angle<angle2 and calcDeterminate(fixToOrigin,fixToP)<0){
                             angle = angle2;
                             res = &p;
                         }
+                        break;
                 }
 
             }
