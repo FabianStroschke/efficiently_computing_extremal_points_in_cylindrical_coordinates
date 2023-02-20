@@ -209,9 +209,8 @@ int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin
             }
 
             if(minAngle>maxAngle){
-                return -1;
-            }else{
-                return index;
+                auto bounds = std::minmax_element(det, det+3);
+                if(not (*bounds.first < 0 and 0 < *bounds.second)) index = -1;
             }
         case BS_RIGHT:
             for(int i= 0; i<4; i++){
@@ -219,11 +218,11 @@ int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin
             }
 
             if(minAngle>maxAngle){
-                return -1;
-            }else{
-                return index;
+                auto bounds = std::minmax_element(det, det+3);
+                if(not (*bounds.first < 0 and 0 < *bounds.second)) index = -1;
             }
     }
+    return index;
 }
 
 Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel::Point_2 &fixPoint, boundarySide side) {
