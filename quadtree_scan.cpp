@@ -125,25 +125,36 @@ int main () {
             detLine[1].emplace_back(-fixToOrigin.y());
             plt::plot(detLine[0], detLine[1], {{"linewidth", "1.5"},{"color", "c"}});
 */
-            for(int c = 0; c<4; c++){
-                for(int gc = 0; gc<4; gc++){
-                    if (not quadtree.root()[c].is_leaf()) {
-                        auto box = quadtree.bbox(quadtree.root()[c][gc]);
-                        std::vector<std::vector<double>> boxLine(2);
-                        boxLine[0].emplace_back(box.xmin());
-                        boxLine[0].emplace_back(box.xmax());
-                        boxLine[0].emplace_back(box.xmax());
-                        boxLine[0].emplace_back(box.xmin());
+            std::stack<Quadtree::Node> stack;
+            stack.push(quadtree.root());
+            while(not stack.empty()){
+                auto currentNode = stack.top();
+                stack.pop();
 
-                        boxLine[1].emplace_back(box.ymin());
-                        boxLine[1].emplace_back(box.ymin());
-                        boxLine[1].emplace_back(box.ymax());
-                        boxLine[1].emplace_back(box.ymax());
+                auto box = quadtree.bbox(currentNode);
+                std::vector<std::vector<double>> boxLine(2);
+                boxLine[0].emplace_back(box.xmin());
+                boxLine[0].emplace_back(box.xmax());
+                boxLine[0].emplace_back(box.xmax());
+                boxLine[0].emplace_back(box.xmin());
+                boxLine[0].emplace_back(box.xmin());
 
-                        plt::plot(boxLine[0], boxLine[1], {{"linewidth", "0.5"},
-                                                           {"color",     "y"}});
-                    }
 
+                boxLine[1].emplace_back(box.ymin());
+                boxLine[1].emplace_back(box.ymin());
+                boxLine[1].emplace_back(box.ymax());
+                boxLine[1].emplace_back(box.ymax());
+                boxLine[1].emplace_back(box.ymin());
+
+
+                plt::plot(boxLine[0], boxLine[1], {{"linewidth", "0.5"},
+                                                   {"color",     "y"}});
+
+                if( not currentNode.is_leaf()){
+                    stack.push(currentNode[0]);
+                    stack.push(currentNode[1]);
+                    stack.push(currentNode[2]);
+                    stack.push(currentNode[3]);
                 }
             }
 
