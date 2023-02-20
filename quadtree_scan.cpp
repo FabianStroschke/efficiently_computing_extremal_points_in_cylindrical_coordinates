@@ -7,34 +7,41 @@
 #include <chrono>
 #include "../external/glm/glm.hpp"
 #include "include/input_generators.h"
-
 #include "matplotlibcpp.h"
-namespace plt = matplotlibcpp;
-
 #include "CGALSetup.h"
 #include <CGAL/Quadtree.h>
+#include <unicodeobject.h>
 
+//macros
+#define calcDeterminate(u,v) u.x()*v.y()-u.y()*v.x()
+
+//namespaces
+namespace plt = matplotlibcpp;
+
+//types & enums
 typedef CGAL::Quadtree<Kernel, std::vector<Kernel::Point_2>> Quadtree;
+enum boundarySide {BS_LEFT,BS_RIGHT};
 
-double cosTheta(Kernel::Vector_2 u,Kernel::Vector_2 v){
-    return u*v/(sqrt(u.squared_length())*sqrt(v.squared_length()));
-}
+//function declarations
+double cosTheta(Kernel::Vector_2 u, Kernel::Vector_2 v);
 
-bool bboxContainsPoint(CGAL::Bbox_2 bbox, Kernel::Point_2 &p){
-    if(bbox.xmin()<p.x() and p.x()<bbox.xmax() and bbox.ymin()<p.y() and p.y()<bbox.ymax()) return true;
-    return false;
-}
+bool bboxContainsPoint(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &p);
+
+int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin, const Kernel::Point_2 &fixPoint, boundarySide side, double minAngle = 0);
+
+Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel::Point_2 &fixPoint, boundarySide side);
+
 
 int main () {
-    int sample_size =20;
-    int seed = std::time(nullptr);
-    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_RANDOM);
+    int sample_size =100;
+    int seed = 1676906237;//std::time(nullptr);
+    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_USUALLY_INSIDE);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 
     Quadtree quadtree(input.pointCloud);
-    quadtree.refine(10,1);
+    quadtree.refine(10,5);
 
     std::chrono::steady_clock::time_point quadTreeFinish = std::chrono::steady_clock::now();
 
@@ -42,178 +49,10 @@ int main () {
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(quadTreeFinish - begin).count() << "[mircos]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (quadTreeFinish - begin).count() << "[ns]" << std::endl;
 
-    //find the biggest angle cw to fixpoint
-    auto getMaxQuadrant_2 = [](CGAL::Bbox_2 bbox, Kernel::Point_2 &origin, Kernel::Point_2 &fixPoint, double minAngle = 0){
-        //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-
-        Kernel::Vector_2 fixToOrigin(fixPoint,origin);
-        Kernel::Vector_2 fixToCorner[4] ={
-                {fixPoint, {bbox.xmin(),bbox.ymin()}},
-                {fixPoint, {bbox.xmax(),bbox.ymin()}},
-                {fixPoint, {bbox.xmin(),bbox.ymax()}},
-                {fixPoint, {bbox.xmax(),bbox.ymax()}}
-        };
-
-        double det[4] = {
-                fixPoint.x()*fixToCorner[0].y() - fixPoint.y()*fixToCorner[0].x(),
-                fixPoint.x()*fixToCorner[1].y() - fixPoint.y()*fixToCorner[1].x(),
-                fixPoint.x()*fixToCorner[2].y() - fixPoint.y()*fixToCorner[2].x(),
-                fixPoint.x()*fixToCorner[3].y() - fixPoint.y()*fixToCorner[3].x()
-        };
-
-        double cosAngle[4] = {
-                cosTheta(fixToOrigin,fixToCorner[0]),
-                cosTheta(fixToOrigin,fixToCorner[1]),
-                cosTheta(fixToOrigin,fixToCorner[2]),
-                cosTheta(fixToOrigin,fixToCorner[3])
-        };
-        double Angle[4] = {
-                acos(cosAngle[0]),
-                acos(cosAngle[1]),
-                acos(cosAngle[2]),
-                acos(cosAngle[3])
-        };
-
-        int index = 0;
-        double angle = 0;
-        for(int i= 0; i<4; i++){
-            if(det[i]<0 and angle<Angle[i]) { index = i; angle = Angle[i]; }
-        }
-
-        if(minAngle>angle){
-            return -1;
-        }else{
-            return index;
-        }
-    };
-
-    //TODO rename functions, because they look for the max left/right angle respectively
-    auto getMinQuadrant_2 = [](CGAL::Bbox_2 bbox, Kernel::Point_2 &origin, Kernel::Point_2 &fixPoint, double minAngle = 0){
-        //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-
-        Kernel::Vector_2 fixToOrigin(fixPoint,origin);
-        Kernel::Vector_2 fixToCorner[4] ={
-                {fixPoint, {bbox.xmin(),bbox.ymin()}},
-                {fixPoint, {bbox.xmax(),bbox.ymin()}},
-                {fixPoint, {bbox.xmin(),bbox.ymax()}},
-                {fixPoint, {bbox.xmax(),bbox.ymax()}}
-        };
-
-        double det[4] = {
-                fixPoint.x()*fixToCorner[0].y() - fixPoint.y()*fixToCorner[0].x(),
-                fixPoint.x()*fixToCorner[1].y() - fixPoint.y()*fixToCorner[1].x(),
-                fixPoint.x()*fixToCorner[2].y() - fixPoint.y()*fixToCorner[2].x(),
-                fixPoint.x()*fixToCorner[3].y() - fixPoint.y()*fixToCorner[3].x()
-        };
-
-        double cosAngle[4] = {
-                cosTheta(fixToOrigin,fixToCorner[0]),
-                cosTheta(fixToOrigin,fixToCorner[1]),
-                cosTheta(fixToOrigin,fixToCorner[2]),
-                cosTheta(fixToOrigin,fixToCorner[3])
-        };
-        double Angle[4] = {
-                acos(cosAngle[0]),
-                acos(cosAngle[1]),
-                acos(cosAngle[2]),
-                acos(cosAngle[3])
-        };
-
-        int index = 0;
-        double angle = 0;
-        for(int i= 0; i<4; i++){
-            if(det[i]>0 and angle<Angle[i]) { index = i; angle = Angle[i]; }
-        }
-
-        if(minAngle>angle){
-            return -1;
-        }else{
-            return index;
-        }
-    };
-
-
     //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-    std::vector<int> quadrantOrder = {0,1,3,2};
 
-    auto bbox = quadtree.bbox(quadtree.root());
-    Kernel::Point_2 origin((bbox.xmax()+bbox.xmin())/2,(bbox.ymax()+bbox.ymin())/2);
-    Kernel::Vector_2 fixToOrigin(input.fixPoint,origin);
-    double angle = 0;
-
-    Kernel::Point_2 const *res = nullptr;
-    Kernel::Point_2 const *res2 = nullptr;
-    int counter = 0;
-
-    std::stack<Quadtree::Node> stack;
-    stack.push(quadtree.root());
-
-    while(not stack.empty()){
-        auto currentNode = stack.top();
-        stack.pop();
-        if(currentNode.is_leaf()){
-            for(auto const &p:currentNode){
-                counter++;
-                double angle2 = acos(cosTheta(fixToOrigin,{input.fixPoint,p}));
-                std::cout << fixToOrigin.x()*(p.y()-input.fixPoint.y()) - fixToOrigin.y()*(p.x()-input.fixPoint.x()) << ";" << p.x() << "|" << p.y()<< ";"<<angle << std::endl;
-
-
-                if(angle<angle2 and fixToOrigin.x()*(p.y()-input.fixPoint.y()) - fixToOrigin.y()*(p.x()-input.fixPoint.x())>0){
-                    angle = angle2;
-                    res = &p;
-                }
-            }
-        }else {
-            counter++;
-            int quad = getMaxQuadrant_2(quadtree.bbox(currentNode), origin, input.fixPoint, angle);
-            if(quad >= 0 or bboxContainsPoint(quadtree.bbox(currentNode),input.fixPoint)) {
-                if (quad == 2) { quad = 3; }
-                else if (quad == 3) { quad = 2; }
-                else if (quad == -1) { quad = 0; }
-
-                for (int i = 3; i >= 0; i--) {
-                    stack.push(currentNode[quadrantOrder[(quad + i) % 4]]);
-                }
-            }
-        }
-    }
-
-    std::cout << "_---------------------------"<< std::endl;
-
-
-    std::stack<Quadtree::Node> stack2;
-    stack2.push(quadtree.root());
-    angle = 0;
-
-    //TODO merge with upper loop or rename
-    while(not stack2.empty()){
-        auto currentNode = stack2.top();
-        stack2.pop();
-        if(currentNode.is_leaf()){
-            for(auto const &p:currentNode){
-                counter++;
-                double angle2 = acos(cosTheta(fixToOrigin,{input.fixPoint,p}));
-                std::cout << fixToOrigin.x()*(p.y()-input.fixPoint.y()) - fixToOrigin.y()*(p.x()-input.fixPoint.x()) << ";" << p.x() << "|" << p.y() << std::endl;
-
-                if(angle<angle2 and fixToOrigin.x()*(p.y()-input.fixPoint.y()) - fixToOrigin.y()*(p.x()-input.fixPoint.x())<0){
-                    angle = angle2;
-                    res2 = &p;
-                }
-            }
-        }else {
-            counter++;
-            int quad = getMinQuadrant_2(quadtree.bbox(currentNode), origin, input.fixPoint, angle);
-            if(quad >= 0 or bboxContainsPoint(quadtree.bbox(currentNode),input.fixPoint)) {
-                if (quad == 2) { quad = 3; }
-                else if (quad == 3) { quad = 2; }
-                else if (quad == -1) { quad = 0; }
-                for (int i = 0; i < 4; i++) {
-                    stack2.push(currentNode[quadrantOrder[(quad + i) % 4]]);
-                }
-            }
-        }
-    }
-
+    Kernel::Point_2 const *res = findBoundaryPoint(quadtree, input.fixPoint, BS_LEFT);
+    Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, input.fixPoint, BS_RIGHT);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -221,7 +60,7 @@ int main () {
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - quadTreeFinish).count() << "[mircos]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - quadTreeFinish).count() << "[ns]" << std::endl;
 
-    std::cout << counter << std::endl;
+    //std::cout << counter << std::endl;
     std::cout << "seed:" << seed << std::endl;
 
 
@@ -266,9 +105,10 @@ int main () {
             resultLine[1].emplace_back(res->y()+(res->y()-input.fixPoint.y()));
 
             auto color = "g";
-            if((res->x()-input.fixPoint.x())*(res2->y()-input.fixPoint.y()) - (res->y()-input.fixPoint.y())*(res2->x()-input.fixPoint.x()) >0) color = "r";
+            if(calcDeterminate(Kernel::Vector_2(input.fixPoint,*res),Kernel::Vector_2(input.fixPoint, *res2))>0) color = "r";
+
             plt::plot(resultLine2[0], resultLine2[1], {{"linewidth", "1.5"},{"color",color}});
-            plt::plot(resultLine[0], resultLine[1], {{"linewidth", "1.5"},{"color", "r"}});
+            plt::plot(resultLine[0], resultLine[1], {{"linewidth", "1.5"},{"color", color}});
             std::cout<<res->x()*res2->y() - res->y()*res2->x()<<std::endl;
 /*
             originLine[0].emplace_back(input.fixPoint.x());
@@ -312,4 +152,117 @@ int main () {
     }
 
     return 0;
+}
+
+double cosTheta(Kernel::Vector_2 u, Kernel::Vector_2 v){
+    return u*v/(sqrt(u.squared_length())*sqrt(v.squared_length()));
+}
+
+bool bboxContainsPoint(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &p){
+    if(bbox.xmin()<p.x() and p.x()<bbox.xmax() and bbox.ymin()<p.y() and p.y()<bbox.ymax()) return true;
+    return false;
+}
+
+int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin, const Kernel::Point_2 &fixPoint, boundarySide side, double minAngle){
+//for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
+
+    Kernel::Vector_2 fixToOrigin(fixPoint,origin);
+    Kernel::Vector_2 fixToCorner[4] ={
+            {fixPoint, {bbox.xmin(),bbox.ymin()}},
+            {fixPoint, {bbox.xmax(),bbox.ymin()}},
+            {fixPoint, {bbox.xmin(),bbox.ymax()}},
+            {fixPoint, {bbox.xmax(),bbox.ymax()}}
+    };
+
+    double det[4] = {
+            calcDeterminate(fixPoint,fixToCorner[0]),
+            calcDeterminate(fixPoint,fixToCorner[1]),
+            calcDeterminate(fixPoint,fixToCorner[2]),
+            calcDeterminate(fixPoint,fixToCorner[3])
+    };
+
+    double angle[4] = {
+            acos(cosTheta(fixToOrigin,fixToCorner[0])),
+            acos(cosTheta(fixToOrigin,fixToCorner[1])),
+            acos(cosTheta(fixToOrigin,fixToCorner[2])),
+            acos(cosTheta(fixToOrigin,fixToCorner[3]))
+    };
+
+    int index = 0;
+    double maxAngle = 0;
+
+    switch (side) {
+        case BS_LEFT:
+            for(int i= 0; i<4; i++){
+                if(det[i]<0 and maxAngle<angle[i]) { index = i; maxAngle = angle[i]; }
+            }
+
+            if(minAngle>maxAngle){
+                return -1;
+            }else{
+                return index;
+            }
+        case BS_RIGHT:
+            for(int i= 0; i<4; i++){
+                if(det[i]>0 and maxAngle<angle[i]) { index = i; maxAngle = angle[i]; }
+            }
+
+            if(minAngle>maxAngle){
+                return -1;
+            }else{
+                return index;
+            }
+    }
+}
+
+Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel::Point_2 &fixPoint, boundarySide side) {
+    Kernel::Point_2 const *res = nullptr;
+    auto bbox = quadtree.bbox(quadtree.root());
+    Kernel::Point_2 origin((bbox.xmax()+bbox.xmin())/2,(bbox.ymax()+bbox.ymin())/2);
+    Kernel::Vector_2 fixToOrigin(fixPoint,origin);
+
+    double angle = 0;
+    std::vector<int> quadrantOrder = {0,1,3,2};
+
+    std::stack<Quadtree::Node> stack;
+    stack.push(quadtree.root());
+
+
+    while(not stack.empty()){
+        auto currentNode = stack.top();
+        stack.pop();
+        if(currentNode.is_leaf()){
+            for(auto const &p:currentNode){
+                double angle2 = acos(cosTheta(fixToOrigin,{fixPoint,p}));
+                auto fixToP = Kernel::Vector_2(fixPoint,p);
+
+
+                switch (side) {
+                    case BS_LEFT:
+                        if(angle<angle2 and calcDeterminate(fixToOrigin,fixToP)>0){
+                            angle = angle2;
+                            res = &p;
+                        }
+                    case BS_RIGHT:
+                        if(angle<angle2 and calcDeterminate(fixToOrigin,fixToP)<0){
+                            angle = angle2;
+                            res = &p;
+                        }
+                }
+
+            }
+        }else {
+            int quad = findBoundaryQuadrant(quadtree.bbox(currentNode), origin, fixPoint, side, angle);
+            if(quad >= 0 or bboxContainsPoint(quadtree.bbox(currentNode),fixPoint)) {
+                if (quad == 2) { quad = 3; }
+                else if (quad == 3) { quad = 2; }
+                else if (quad == -1) { quad = 0; }
+
+                for (int i = 3; i >= 0; i--) {
+                    stack.push(currentNode[quadrantOrder[(quad + i) % 4]]);
+                }
+            }
+        }
+    }
+    return res;
 }
