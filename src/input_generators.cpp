@@ -5,8 +5,8 @@
 #include "input_generators.h"
 
 template<typename PointType>
-Input<PointType> generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim) {
-    Input<PointType> res;
+InputVec2<PointType> generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim) {
+    InputVec2<PointType> res;
 
     //generate point cloud and fixpoint
     srand(seed);
@@ -38,7 +38,7 @@ Input<PointType> generateInputVec2(int sample_size, int seed, fixPointLocation h
 
 
 template
-Input<CGAL::Point_2<CGAL::Epick> > generateInputVec2<CGAL::Point_2<CGAL::Epick> >(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
+InputVec2<Kernel::Point_2> generateInputVec2<Kernel::Point_2>(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
 
 template
-Input<glm::vec2> generateInputVec2<glm::vec2>(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
+InputVec2<glm::vec2> generateInputVec2<glm::vec2>(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);

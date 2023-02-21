@@ -15,12 +15,12 @@
 enum fixPointLocation {FPL_CONVEXHULL, FPL_RANDOM, FPL_USUALLY_INSIDE, FPL_CENTER};
 
 template<typename PointType>
-struct Input{
+struct InputVec2{
     std::vector<PointType> pointCloud;
     PointType fixPoint{};
 };
 template<typename PointType>
-Input<PointType> generateInputVec2(int sample_size, int seed = std::time(nullptr), fixPointLocation hint = FPL_RANDOM, size_t x_dim = 100, size_t y_dim = 100);
+InputVec2<PointType> generateInputVec2(int sample_size, int seed = std::time(nullptr), fixPointLocation hint = FPL_RANDOM, size_t x_dim = 100, size_t y_dim = 100);
 
 
 
