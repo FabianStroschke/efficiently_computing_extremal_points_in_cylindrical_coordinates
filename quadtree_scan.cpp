@@ -33,21 +33,19 @@ Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel:
 
 
 int main () {
-    int sample_size =100;
-    int seed = 1676906237;//std::time(nullptr);
-    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_USUALLY_INSIDE);
+    int sample_size =1000000;
+    int seed = std::time(nullptr);
+    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 
     Quadtree quadtree(input.pointCloud);
-    quadtree.refine(10,5);
+    quadtree.refine(10,15);
 
     std::chrono::steady_clock::time_point quadTreeFinish = std::chrono::steady_clock::now();
 
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(quadTreeFinish - begin).count() << "[ms]" << std::endl;
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(quadTreeFinish - begin).count() << "[mircos]" << std::endl;
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (quadTreeFinish - begin).count() << "[ns]" << std::endl;
+
 
     //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
 
@@ -55,6 +53,10 @@ int main () {
     Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, input.fixPoint, BS_RIGHT);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(quadTreeFinish - begin).count() << "[ms]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(quadTreeFinish - begin).count() << "[mircos]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (quadTreeFinish - begin).count() << "[ns]" << std::endl;
 
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - quadTreeFinish).count() << "[ms]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - quadTreeFinish).count() << "[mircos]" << std::endl;
