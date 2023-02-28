@@ -42,3 +42,62 @@ InputVec2<Kernel::Point_2> generateInputVec2<Kernel::Point_2>(int sample_size, i
 
 template
 InputVec2<glm::vec2> generateInputVec2<glm::vec2>(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim);
+
+InputVec3 generateInputVec3(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim, size_t z_dim){
+    InputVec3 res;
+
+    //generate point cloud and fixpoint
+    srand(seed);
+    int r = std::rand();
+    int r2 = std::rand();
+    double scale = 1;
+
+    switch (hint) {
+        case FPL_CONVEXHULL: {
+            res.fixPointSet.first = Kernel::Point_3(sin(r) * sin(r2) * x_dim, cos(r) * sin(r2) * y_dim,
+                                                    cos(r2) * z_dim);
+            auto v = CGAL::cross_product(
+                    Kernel::Vector_3(res.fixPointSet.first, {0, 0, 0}),
+                    Kernel::Vector_3(std::rand(), std::rand(), std::rand()));
+            res.fixPointSet.second = res.fixPointSet.first + (v / sqrt(v.squared_length()))*std::pow(x_dim*y_dim*z_dim,0.3);
+            scale = 0.7;
+            break;
+        }
+        case FPL_RANDOM: {
+            res.fixPointSet.first = Kernel::Point_3(
+                    (float) (rand() % (x_dim * 2)) - x_dim,
+                    (float) (rand() % (y_dim * 2)) - y_dim,
+                    (float) (rand() % (z_dim * 2)) - z_dim);
+            auto v = CGAL::cross_product(
+                    Kernel::Vector_3(res.fixPointSet.first, {0, 0, 0}),
+                    Kernel::Vector_3(std::rand(), std::rand(), std::rand()));
+            res.fixPointSet.second = res.fixPointSet.first + (v / sqrt(v.squared_length()))*std::pow(x_dim*y_dim*z_dim,0.3);
+            break;
+        }
+        case FPL_USUALLY_INSIDE:
+            res.fixPointSet.first = Kernel::Point_3(
+                    (float )(rand() % (x_dim * 2)) - x_dim,
+                    (float )(rand() % (y_dim * 2)) - y_dim,
+                    (float )(rand() % (z_dim * 2)) - z_dim);
+            res.fixPointSet.second = Kernel::Point_3(sin(r) * sin(r2) * x_dim/2, cos(r) * sin(r2) * y_dim/2,
+                                                    cos(r2) * z_dim/2);
+            break;
+        case FPL_CENTER:
+            res.fixPointSet.first = Kernel::Point_3(
+                    (float )(rand() % (x_dim * 2)) - x_dim,
+                    (float )(rand() % (y_dim * 2)) - y_dim,
+                    (float )(rand() % (z_dim * 2)) - z_dim);
+            res.fixPointSet.second = Kernel::Point_3(0,0,0);
+            break;
+    }
+
+    for (int i = 0; i<sample_size; i++) {
+        r = rand();
+        r2 = rand();
+        res.pointCloud.emplace_back(
+                sin(r) * sin(r2) * (rand()%x_dim)*scale,
+                cos(r) * sin(r2) * (rand()%y_dim)*scale,
+                            cos(r2) * (rand()%z_dim)*scale);
+    }
+    return res;
+}
