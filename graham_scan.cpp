@@ -28,19 +28,21 @@ int main () {
 
     CGAL::ch_graham_andrew( input.pointCloud.begin(), input.pointCloud.end(), std::back_inserter(out) );
 
-    //TODO: find solution vectors
+    Kernel::Point_2 res1;
+    Kernel::Point_2 res2;
     for(int i = 0; i< out.size(); i++){
-        std::cout << out[i].x() << "|" << out[i].y() << "\n";
+        //std::cout << out[i].x() << "|" << out[i].y() << "\n";
 
         if(out[i].x() == input.fixPoint.x() and out[i].y() == input.fixPoint.y()){
             //(i+out.size()-1)%out.size() enables looping around the list
-            std::cout <<  "---------------------------------------" << "\n";
-            std::cout << out[(i+out.size()-1)%out.size()].x() << "|" << out[(i+out.size()-1)%out.size()].y() << "\n";
-            std::cout << input.fixPoint.x() << "|" << input.fixPoint.y() << "\n";
-            std::cout << out[(i+out.size()+1)%out.size()].x() << "|" << out[(i+out.size()+1)%out.size()].y() << "\n";
-            std::cout <<  "---------------------------------------" << "\n";
-
-            //break;
+            //std::cout <<  "---------------------------------------" << "\n";
+            //std::cout << out[(i+out.size()-1)%out.size()].x() << "|" << out[(i+out.size()-1)%out.size()].y() << "\n";
+            res1 = out[(i+out.size()-1)%out.size()];
+            //std::cout << input.fixPoint.x() << "|" << input.fixPoint.y() << "\n";
+            res2 = out[(i+out.size()+1)%out.size()];
+            //std::cout << out[(i+out.size()+1)%out.size()].x() << "|" << out[(i+out.size()+1)%out.size()].y() << "\n";
+            //std::cout <<  "---------------------------------------" << "\n";
+            break;
         }
     }
 
