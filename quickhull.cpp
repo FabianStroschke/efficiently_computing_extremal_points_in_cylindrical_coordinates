@@ -16,7 +16,7 @@ typedef Kernel::Point_3                                Point_3;
 typedef CGAL::Surface_mesh<Point_3>                    Surface_mesh;
 
 int main () {
-    auto input = generateInputVec3(sample_size, seed, FPL_RANDOM);
+    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
     input.pointCloud.emplace_back(input.fixPointSet.first);
     input.pointCloud.emplace_back(input.fixPointSet.second);
 
@@ -26,12 +26,25 @@ int main () {
     // compute convex hull of non-collinear points
     CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
 
-    auto color = "r";
+    Kernel ::Point_3 res1;
+    Kernel ::Point_3 res2;
+
+    bool resExists = false;
     for(auto e = poly.halfedges_begin();e!=poly.halfedges_end();e++){
         if(e->vertex()->point() == input.fixPointSet.first
            and e->next()->vertex()->point() == input.fixPointSet.second) {
-            //std::cout << "True\n";
-            color = "g";
+            resExists = true;
+
+            //find first solution
+            auto f = e->facet_begin();
+            while(f->vertex()->point() == input.fixPointSet.first or f->vertex()->point() == input.fixPointSet.second) f++;
+            res1 = f->vertex()->point();
+
+            //find second solution
+            f = e->next()->opposite()->facet_begin();
+            while(f->vertex()->point() == input.fixPointSet.first or f->vertex()->point() == input.fixPointSet.second) f++;
+            res2 = f->vertex()->point();
+
             break;
         }
     }
@@ -52,12 +65,7 @@ int main () {
             scatterPoints[1].emplace_back(p.y());
             scatterPoints[2].emplace_back(p.z());
         }
-        fixPointSet[0].emplace_back(input.fixPointSet.first.x());
-        fixPointSet[0].emplace_back(input.fixPointSet.second.x());
-        fixPointSet[1].emplace_back(input.fixPointSet.first.y());
-        fixPointSet[1].emplace_back(input.fixPointSet.second.y());
-        fixPointSet[2].emplace_back(input.fixPointSet.first.z());
-        fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+
 
         for(auto &p: poly.points()){
             convexHull[0].emplace_back(p.x());
@@ -96,7 +104,32 @@ int main () {
 
         }
 
-        plt::plot3(fixPointSet[0],fixPointSet[1],fixPointSet[2], {{"linewidth","1.0"},{"color", color}},1);
+        fixPointSet[0].emplace_back(input.fixPointSet.first.x());
+        fixPointSet[0].emplace_back(input.fixPointSet.second.x());
+        fixPointSet[1].emplace_back(input.fixPointSet.first.y());
+        fixPointSet[1].emplace_back(input.fixPointSet.second.y());
+        fixPointSet[2].emplace_back(input.fixPointSet.first.z());
+        fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+
+        if(resExists){
+            fixPointSet[0].emplace_back(res1.x());
+            fixPointSet[0].emplace_back(input.fixPointSet.first.x());
+            fixPointSet[0].emplace_back(res2.x());
+            fixPointSet[0].emplace_back(input.fixPointSet.second.x());
+
+            fixPointSet[1].emplace_back(res1.y());
+            fixPointSet[1].emplace_back(input.fixPointSet.first.y());
+            fixPointSet[1].emplace_back(res2.y());
+            fixPointSet[1].emplace_back(input.fixPointSet.second.y());
+
+            fixPointSet[2].emplace_back(res1.z());
+            fixPointSet[2].emplace_back(input.fixPointSet.first.z());
+            fixPointSet[2].emplace_back(res2.z());
+            fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+            plt::plot3(fixPointSet[0],fixPointSet[1],fixPointSet[2], {{"linewidth","1.0"},{"color","g"}},1);
+        }else{
+            plt::plot3(fixPointSet[0],fixPointSet[1],fixPointSet[2], {{"linewidth","1.0"},{"color", "r"}},1);
+        }
 
 
         plt::show();
