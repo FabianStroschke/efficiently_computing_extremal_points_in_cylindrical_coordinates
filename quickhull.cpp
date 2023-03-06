@@ -3,7 +3,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/convex_hull_3.h>
-#include "matplotlibcpp.h"
+#include "external/matplotlibcpp/matplotlibcpp.h"
 
 //namespaces
 namespace plt = matplotlibcpp;

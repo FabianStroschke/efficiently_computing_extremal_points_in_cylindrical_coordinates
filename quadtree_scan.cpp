@@ -7,7 +7,7 @@
 #include <chrono>
 #include "../external/glm/glm.hpp"
 #include "include/input_generators.h"
-#include "matplotlibcpp.h"
+#include "external/matplotlibcpp/matplotlibcpp.h"
 #include "CGALSetup.h"
 #include <CGAL/Quadtree.h>
 #include <unicodeobject.h>
