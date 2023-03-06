@@ -1,4 +1,6 @@
 #include "include/input_generators.h"
+#include "include/config.h"
+
 #include "CGALSetup.h"
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh.h>
@@ -14,9 +16,6 @@ typedef Kernel::Point_3                                Point_3;
 typedef CGAL::Surface_mesh<Point_3>                    Surface_mesh;
 
 int main () {
-    int sample_size =1000000;
-    int seed = std::time(nullptr);
-
     auto input = generateInputVec3(sample_size, seed, FPL_RANDOM);
     input.pointCloud.emplace_back(input.fixPointSet.first);
     input.pointCloud.emplace_back(input.fixPointSet.second);
@@ -42,8 +41,7 @@ int main () {
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
 
-    bool show = true;
-    if(show) {
+    if(MatPlotShow) {
         //Matplot
         std::vector<std::vector<double>> scatterPoints(3);
         std::vector<std::vector<double>> fixPointSet(3);

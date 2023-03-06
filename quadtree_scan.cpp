@@ -1,19 +1,16 @@
-#include <cstdio>
 #include <stack>
 #include <algorithm>
-#include <ctime>
 #include <vector>
 #include <iostream>
 #include <chrono>
-#include "../external/glm/glm.hpp"
 #include "include/input_generators.h"
+#include "include/config.h"
 #include "external/matplotlibcpp/matplotlibcpp.h"
 #include "CGALSetup.h"
 #include <CGAL/Quadtree.h>
-#include <unicodeobject.h>
 
 //macros
-#define calcDeterminate(u,v) u.x()*v.y()-u.y()*v.x()
+#define calcDeterminate(u,v) (u.x()*v.y()-u.y()*v.x())
 
 //namespaces
 namespace plt = matplotlibcpp;
@@ -33,8 +30,6 @@ Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel:
 
 
 int main () {
-    int sample_size =1000000;
-    int seed = std::time(nullptr);
     auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -66,8 +61,7 @@ int main () {
     std::cout << "seed:" << seed << std::endl;
 
 
-    bool show = true;
-    if(show) {
+    if(MatPlotShow) {
         //Matplot
         std::vector<std::vector<double>> scatterPoints(2);
         std::vector<std::vector<double>> fixpoint(2);

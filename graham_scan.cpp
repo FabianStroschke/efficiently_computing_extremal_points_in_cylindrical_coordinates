@@ -1,12 +1,9 @@
-#include <cstdio>
 #include <stack>
-#include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <vector>
 #include <iostream>
-#include <chrono>
-#include "../external/glm/glm.hpp"
 #include "include/input_generators.h"
+#include "include/config.h"
 
 #include "CGALSetup.h"
 #include <CGAL/ch_graham_andrew.h>
@@ -14,8 +11,6 @@
 using namespace std;
 
 int main () {
-    int sample_size =50;
-    int seed = std::time(nullptr);
     auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
     input.pointCloud.push_back(input.fixPoint); //add fixpoint to point cloud, so that graham scan can find a convex hull containing the fixpoint
 
