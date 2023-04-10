@@ -11,18 +11,15 @@ int main() {
     std::ofstream log;
     log.open ("log.txt", std::ios::out | std::ios::app );
 
-    for (int i = 0; i < 10; i++) {
-        //seed = std::time(nullptr)+i;
-        auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_RANDOM);
+    //seed = std::time(nullptr)+i;
+    auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_RANDOM);
 
-        log << i << ",";
-        log_function_time(auto res = modifiedGrahamScanVec2(input.pointCloud, input.fixPoint,false),log); //TODO output solution vectors
-        log << "\n";
-        std::cout<<res[0].x<<"|"<<res[0].y<<"\n";
-        std::cout<<res[1].x<<"|"<<res[1].y<<"\n";
-        std::cout<<"_____________________________________________\n";
-
-    }
+    log << sample_size << ",";
+    log_function_time(auto res = modifiedGrahamScanVec2(input.pointCloud, input.fixPoint,false),log); //TODO output solution vectors
+    log << "\n";
+    std::cout<<res[0].x<<"|"<<res[0].y<<"\n";
+    std::cout<<res[1].x<<"|"<<res[1].y<<"\n";
+    std::cout<<"_____________________________________________\n";
 
     log.close();
 }
