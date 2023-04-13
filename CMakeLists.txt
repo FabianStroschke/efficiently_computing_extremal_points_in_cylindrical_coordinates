@@ -22,7 +22,7 @@ add_subdirectory(external/glm)
 find_package(CGAL REQUIRED COMPONENTS Core)
 
 # add executables
-add_executable(optimizedGrahamScan optimized_graham_sacn.cpp src/input_generators.cpp src/optimizedGrahamScan.cpp)
+add_executable(optimizedGrahamScan optimized_graham_scan.cpp src/input_generators.cpp src/optimizedGrahamScan.cpp)
 add_executable(grahamScan graham_scan.cpp src/input_generators.cpp)
 add_executable(quadtreeScan quadtree_scan.cpp src/input_generators.cpp)
 add_executable(quickhull quickhull.cpp src/input_generators.cpp)
