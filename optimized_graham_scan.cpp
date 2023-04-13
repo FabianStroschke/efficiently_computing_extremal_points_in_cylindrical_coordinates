@@ -1,7 +1,7 @@
 #include <fstream>
 #include "external/glm/glm.hpp"
 #include "include/input_generators.h"
-#include "include/modifiedGrahamScan.h"
+#include "include/optimizedGrahamScan.h"
 #include "include/config.h"
 
 
