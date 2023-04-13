@@ -22,25 +22,25 @@ add_subdirectory(external/glm)
 find_package(CGAL REQUIRED COMPONENTS Core)
 
 # add executables
-add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp)
-add_executable(gscan graham_scan.cpp src/input_generators.cpp)
-add_executable(quadscan quadtree_scan.cpp src/input_generators.cpp)
+add_executable(optimizedGrahamScan optimized_graham_sacn.cpp src/input_generators.cpp src/optimizedGrahamScan.cpp)
+add_executable(grahamScan graham_scan.cpp src/input_generators.cpp)
+add_executable(quadtreeScan quadtree_scan.cpp src/input_generators.cpp)
 add_executable(quickhull quickhull.cpp src/input_generators.cpp)
-add_executable(octscan octree_scan.cpp src/input_generators.cpp)
+add_executable(octreeScan octree_scan.cpp src/input_generators.cpp)
 
 #link main
-target_link_libraries(main
+target_link_libraries(optimizedGrahamScan
         Python::Python
         Python::Module
         Python::NumPy
         )
 
 #link gscan
-target_link_libraries(gscan CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(grahamScan CGAL::CGAL CGAL::CGAL_Core)
 
 #link quadscan
-target_link_libraries(quadscan CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(quadscan
+target_link_libraries(quadtreeScan CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(quadtreeScan
         Python::Python
         Python::Module
         Python::NumPy
