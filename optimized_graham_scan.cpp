@@ -15,7 +15,7 @@ int main() {
     log.open ("log.txt", std::ios::out | std::ios::app );
 
     //seed = std::time(nullptr)+i;
-    auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_RANDOM);
+    auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_CONVEXHULL);
 
     log << sample_size << ",";
     log_function_time(auto res = optimizedGrahamScanVec2(input.pointCloud, input.fixPoint, MatPlotShow), log);
@@ -23,6 +23,7 @@ int main() {
     std::cout<<res[0].x<<"|"<<res[0].y<<"\n";
     std::cout<<res[1].x<<"|"<<res[1].y<<"\n";
     std::cout<<"_____________________________________________\n";
+    std::cout<<seed <<"\n";
 
     log.close();
 }
@@ -74,16 +75,6 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
     double max =0;
     double angle =0;
     for(int i= 0; i<vectorList.size(); i++){
-        if(not vectorList[i].empty()){
-            if(offset == -1) offset = i;
-            if(angle>max-min) {
-                min = i - angle;
-                max = i;
-            }
-            angle = 0;
-        }
-        angle++;
-
         //Matplot
         if(show) {
             for (auto &[a, v]: vectorList[i]) {
@@ -108,6 +99,17 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
                 plt::pause(0.001);
             }
         }
+
+        if(not vectorList[i].empty()){
+            if(offset == -1) offset = i;
+            if(angle>max-min) {
+                min = i - angle;
+                max = i;
+            }
+            if(angle>180)break;
+            angle = 0;
+        }
+        angle++;
     }
     if(angle+offset>max-min) {
         min = vectorList.size()-angle;
