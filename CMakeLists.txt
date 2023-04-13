@@ -26,6 +26,7 @@ add_executable(main main.cpp src/input_generators.cpp src/modifiedGrahamScan.cpp
 add_executable(gscan graham_scan.cpp src/input_generators.cpp)
 add_executable(quadscan quadtree_scan.cpp src/input_generators.cpp)
 add_executable(quickhull quickhull.cpp src/input_generators.cpp)
+add_executable(octscan octree_scan.cpp src/input_generators.cpp)
 
 #link main
 target_link_libraries(main
