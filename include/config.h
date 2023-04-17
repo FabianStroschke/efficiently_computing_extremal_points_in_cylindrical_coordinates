@@ -7,7 +7,7 @@
 
 #include <chrono>
 
-int sample_size =100;
+int sample_size = 100;
 int seed = std::time(nullptr);
 bool MatPlotShow = true;
 

@@ -1,6 +1,6 @@
 # Projects Settings
-cmake_minimum_required (VERSION 3.1)
-project (WIP)
+cmake_minimum_required(VERSION 3.1)
+project(WIP)
 
 #static compile
 #set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")

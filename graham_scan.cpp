@@ -10,31 +10,32 @@
 
 using namespace std;
 
-int main () {
+int main() {
     auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
-    input.pointCloud.push_back(input.fixPoint); //add fixpoint to point cloud, so that graham scan can find a convex hull containing the fixpoint
+    input.pointCloud.push_back(
+            input.fixPoint); //add fixpoint to point cloud, so that graham scan can find a convex hull containing the fixpoint
 
 
-    std::vector<Kernel::Point_2>  out;
+    std::vector<Kernel::Point_2> out;
 
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-    CGAL::ch_graham_andrew( input.pointCloud.begin(), input.pointCloud.end(), std::back_inserter(out) );
+    CGAL::ch_graham_andrew(input.pointCloud.begin(), input.pointCloud.end(), std::back_inserter(out));
 
     Kernel::Point_2 res1;
     Kernel::Point_2 res2;
-    for(int i = 0; i< out.size(); i++){
+    for (int i = 0; i < out.size(); i++) {
         //std::cout << out[i].x() << "|" << out[i].y() << "\n";
 
-        if(out[i].x() == input.fixPoint.x() and out[i].y() == input.fixPoint.y()){
+        if (out[i].x() == input.fixPoint.x() and out[i].y() == input.fixPoint.y()) {
             //(i+out.size()-1)%out.size() enables looping around the list
             //std::cout <<  "---------------------------------------" << "\n";
             //std::cout << out[(i+out.size()-1)%out.size()].x() << "|" << out[(i+out.size()-1)%out.size()].y() << "\n";
-            res1 = out[(i+out.size()-1)%out.size()];
+            res1 = out[(i + out.size() - 1) % out.size()];
             //std::cout << input.fixPoint.x() << "|" << input.fixPoint.y() << "\n";
-            res2 = out[(i+out.size()+1)%out.size()];
+            res2 = out[(i + out.size() + 1) % out.size()];
             //std::cout << out[(i+out.size()+1)%out.size()].x() << "|" << out[(i+out.size()+1)%out.size()].y() << "\n";
             //std::cout <<  "---------------------------------------" << "\n";
             break;
@@ -42,12 +43,13 @@ int main () {
     }
 
 
-
-
     end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]" << std::endl;
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
+              << "[ms]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
+              << "[mircos]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()
+              << "[ns]" << std::endl;
 
 
     return 0;
