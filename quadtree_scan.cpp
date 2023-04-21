@@ -213,6 +213,11 @@ int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin
             acos(cosTheta(fixToOrigin, fixToCorner[2])),
             acos(cosTheta(fixToOrigin, fixToCorner[3]))
     };
+    //give angele orientation based on sign of determinate
+    if(det[0]<0) angle[0] *= -1;
+    if(det[1]<0) angle[1] *= -1;
+    if(det[2]<0) angle[2] *= -1;
+    if(det[3]<0) angle[3] *= -1;
 
     int index = 0;
     double maxAngle = 0;
@@ -220,26 +225,26 @@ int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin
     switch (side) {
         case BS_LEFT:
             for (int i = 0; i < 4; i++) {
-                if (det[i] < 0 and maxAngle < angle[i]) {
+                if (maxAngle < -angle[i]) {
                     index = i;
-                    maxAngle = angle[i];
+                    maxAngle = -angle[i];
                 }
             }
 
             if (minAngle > maxAngle) {
-                auto bounds = std::minmax_element(det, det + 3);
+                auto bounds = std::minmax_element(angle, angle + 3);
                 if (not(*bounds.first < 0 and 0 < *bounds.second)) index = -1;
             }
         case BS_RIGHT:
             for (int i = 0; i < 4; i++) {
-                if (det[i] > 0 and maxAngle < angle[i]) {
+                if (maxAngle < angle[i]) {
                     index = i;
                     maxAngle = angle[i];
                 }
             }
 
             if (minAngle > maxAngle) {
-                auto bounds = std::minmax_element(det, det + 3);
+                auto bounds = std::minmax_element(angle, angle + 3);
                 if (not(*bounds.first < 0 and 0 < *bounds.second)) index = -1;
             }
     }
