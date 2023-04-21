@@ -31,8 +31,8 @@ int main() {
     /** Solving the Problem here **/
     //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
 
-    Kernel::Point_2 const *res = findBoundaryPoint(quadtree, input.fixPoint, BS_LEFT);
-    Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, input.fixPoint, BS_RIGHT);
+    //Kernel::Point_2 const *res = findBoundaryPoint(quadtree, input.fixPoint, BS_LEFT);
+    //Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, input.fixPoint, BS_RIGHT);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -58,4 +58,55 @@ int main() {
 
     //std::cout << counter << std::endl;
     std::cout << "seed:" << seed << std::endl;
+
+    if (MatPlotShow) {
+        //Matplot
+        std::vector<std::vector<double>> scatterPoints(3);
+        std::vector<std::vector<double>> fixPointSet(3);
+
+        for (auto &p: input.pointCloud) {
+            scatterPoints[0].emplace_back(p.x());
+            scatterPoints[1].emplace_back(p.y());
+            scatterPoints[2].emplace_back(p.z());
+        }
+
+        plt::figure(1);
+        plt::clf();
+        plt::plot3(scatterPoints[0], scatterPoints[1], scatterPoints[2], {{"linewidth",  "0.0"},
+                                                                          {"marker",     "x"},
+                                                                          {"markersize", "2.5"}}, 1);
+
+        fixPointSet[0].emplace_back(input.fixPointSet.first.x());
+        fixPointSet[0].emplace_back(input.fixPointSet.second.x());
+        fixPointSet[1].emplace_back(input.fixPointSet.first.y());
+        fixPointSet[1].emplace_back(input.fixPointSet.second.y());
+        fixPointSet[2].emplace_back(input.fixPointSet.first.z());
+        fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+/*
+        if (resExists) {
+            fixPointSet[0].emplace_back(res1.x());
+            fixPointSet[0].emplace_back(input.fixPointSet.first.x());
+            fixPointSet[0].emplace_back(res2.x());
+            fixPointSet[0].emplace_back(input.fixPointSet.second.x());
+
+            fixPointSet[1].emplace_back(res1.y());
+            fixPointSet[1].emplace_back(input.fixPointSet.first.y());
+            fixPointSet[1].emplace_back(res2.y());
+            fixPointSet[1].emplace_back(input.fixPointSet.second.y());
+
+            fixPointSet[2].emplace_back(res1.z());
+            fixPointSet[2].emplace_back(input.fixPointSet.first.z());
+            fixPointSet[2].emplace_back(res2.z());
+            fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+            plt::plot3(fixPointSet[0], fixPointSet[1], fixPointSet[2], {{"linewidth", "1.0"},
+                                                                        {"color",     "g"}}, 1);
+        } else {*/
+            plt::plot3(fixPointSet[0], fixPointSet[1], fixPointSet[2], {{"linewidth", "1.0"},
+                                                                        {"color",     "r"}}, 1);
+        //}
+
+
+        plt::show();
+    }
+
 }

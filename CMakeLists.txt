@@ -53,3 +53,9 @@ target_link_libraries(quickhull
         Python::Module
         Python::NumPy
         )
+target_link_libraries(octreeScan CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(octreeScan
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )
