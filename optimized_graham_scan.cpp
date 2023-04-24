@@ -106,7 +106,6 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
                 min = i - angle;
                 max = i;
             }
-            if (angle > 180)break;
             angle = 0;
         }
         angle++;
