@@ -8,21 +8,21 @@
 
 #define log_function_time(f, oStream) std::chrono::steady_clock::time_point logger_begin = std::chrono::steady_clock::now(); f;  std::chrono::steady_clock::time_point logger_end = std::chrono::steady_clock::now(); log <<  std::chrono::duration_cast<std::chrono::microseconds>(logger_end - logger_begin).count();
 
-std::vector<glm::vec2>
-optimizedGrahamScanVec2(std::vector<glm::vec2> &pointCloud, glm::vec2 &fixPoint, bool show = false);
+std::vector<Kernel::Point_2>
+optimizedGrahamScanVec2(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint, bool show = false);
 
 int main() {
     std::ofstream log;
     log.open("log.txt", std::ios::out | std::ios::app);
 
     //seed = std::time(nullptr)+i;
-    auto input = generateInputVec2<glm::vec2>(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec2(sample_size, seed, FPL_CONVEXHULL);
 
     log << sample_size << ",";
     log_function_time(auto res = optimizedGrahamScanVec2(input.pointCloud, input.fixPoint, MatPlotShow), log);
     log << "\n";
-    std::cout << res[0].x << "|" << res[0].y << "\n";
-    std::cout << res[1].x << "|" << res[1].y << "\n";
+    std::cout << res[0].x() << "|" << res[0].y() << "\n";
+    std::cout << res[1].x() << "|" << res[1].y() << "\n";
     std::cout << "_____________________________________________\n";
     std::cout << seed << "\n";
 
@@ -33,9 +33,9 @@ namespace plt = matplotlibcpp;
 
 struct angleVec2Pair {
     double angle;
-    glm::vec2 vec;
+    Kernel::Point_2 vec;
 
-    angleVec2Pair(double a, glm::vec2 v) : angle(a), vec(v) {};
+    angleVec2Pair(double a, Kernel::Point_2 v) : angle(a), vec(v) {};
 
     bool operator<(const angleVec2Pair &other) const {
         return angle < other.angle;
@@ -43,10 +43,10 @@ struct angleVec2Pair {
 };
 
 //TODO: Matplot doesnt work from different source file
-std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointCloud, glm::vec2 &fixPoint, bool show) {
+std::vector<Kernel::Point_2> optimizedGrahamScanVec2(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint, bool show) {
     std::vector<std::vector<angleVec2Pair>> vectorList(360);
     for (auto &p: pointCloud) {
-        auto angle = atan2(fixPoint.y - p.y, fixPoint.x - p.x) * 180 / M_PI + 180; //TODO: vlt zu p-fixpoint ändern, damit die rotation klarer um den fixpunkt geht
+        auto angle = atan2(fixPoint.y() - p.y(), fixPoint.x() - p.x()) * 180 / M_PI + 180; //TODO: vlt zu p-fixpoint ändern, damit die rotation klarer um den fixpunkt geht
         if (angle > 360)angle -= 360;
         vectorList[(int) angle].emplace_back(angle, p);
     }
@@ -60,14 +60,14 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
     //Matplot
     if (show) {
         //convert vectors for matplot
-        x1.emplace_back(fixPoint.x);
-        y1.emplace_back(fixPoint.y);
+        x1.emplace_back(fixPoint.x());
+        y1.emplace_back(fixPoint.y());
 
 
-        line.first.emplace_back(fixPoint.x);
-        line.first.emplace_back(fixPoint.x);
-        line.second.emplace_back(fixPoint.y);
-        line.second.emplace_back(fixPoint.y);
+        line.first.emplace_back(fixPoint.x());
+        line.first.emplace_back(fixPoint.x());
+        line.second.emplace_back(fixPoint.y());
+        line.second.emplace_back(fixPoint.y());
     }
 
     int offset = -1;
@@ -78,10 +78,10 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
         //Matplot
         if (show) {
             for (auto &[a, v]: vectorList[i]) {
-                x.emplace_back(v.x);
-                y.emplace_back(v.y);
-                line.first[1] = v.x;
-                line.second[1] = v.y;
+                x.emplace_back(v.x());
+                y.emplace_back(v.y());
+                line.first[1] = v.x();
+                line.second[1] = v.y();
                 //std::cout << k<<"\n";
                 plt::clf();
                 plt::ylim(-120, 120);
@@ -124,12 +124,12 @@ std::vector<glm::vec2> optimizedGrahamScanVec2(std::vector<glm::vec2> &pointClou
     //Matplot
     if (show) {
         std::pair<std::vector<float>, std::vector<float>> res;
-        res.first.emplace_back(vmin.vec.x + (vmin.vec.x - fixPoint.x));
-        res.first.emplace_back(fixPoint.x);
-        res.first.emplace_back(vmax.vec.x + (vmax.vec.x - fixPoint.x));
-        res.second.emplace_back(vmin.vec.y + (vmin.vec.y - fixPoint.y));
-        res.second.emplace_back(fixPoint.y);
-        res.second.emplace_back(vmax.vec.y + (vmax.vec.y - fixPoint.y));
+        res.first.emplace_back(vmin.vec.x() + (vmin.vec.x() - fixPoint.x()));
+        res.first.emplace_back(fixPoint.x());
+        res.first.emplace_back(vmax.vec.x() + (vmax.vec.x() - fixPoint.x()));
+        res.second.emplace_back(vmin.vec.y() + (vmin.vec.y() - fixPoint.y()));
+        res.second.emplace_back(fixPoint.y());
+        res.second.emplace_back(vmax.vec.y() + (vmax.vec.y() - fixPoint.y()));
         plt::plot(res.first, res.second, {{"linewidth", "1.5"}});
 
         plt::show();
