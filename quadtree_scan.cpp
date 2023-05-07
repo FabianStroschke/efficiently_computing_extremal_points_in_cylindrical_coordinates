@@ -31,50 +31,30 @@ int findBoundaryQuadrant(const CGAL::Bbox_2 &bbox, const Kernel::Point_2 &origin
 
 Kernel::Point_2 const *findBoundaryPoint(const Quadtree &quadtree, const Kernel::Point_2 &fixPoint, boundarySide side);
 
+std::vector<Kernel::Point_2>
+quadtreeScan(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint);
 
 int main() {
     auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-
-    Quadtree quadtree(input.pointCloud);
-    quadtree.refine(10, 15);
-
-    std::chrono::steady_clock::time_point quadTreeFinish = std::chrono::steady_clock::now();
-
-
-
-    //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-
-    Kernel::Point_2 const *res = findBoundaryPoint(quadtree, input.fixPoint, BS_LEFT);
-    Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, input.fixPoint, BS_RIGHT);
+    auto res = quadtreeScan(input.pointCloud, input.fixPoint);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(quadTreeFinish - begin).count() << "[ms]"
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
               << std::endl;
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(quadTreeFinish - begin).count() << "[mircos]"
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
               << std::endl;
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(quadTreeFinish - begin).count() << "[ns]"
-              << std::endl;
-
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - quadTreeFinish).count() << "[ms]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - quadTreeFinish).count() << "[mircos]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - quadTreeFinish).count() << "[ns]"
+              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
               << std::endl;
 
     //std::cout << counter << std::endl;
     std::cout << "seed:" << seed << std::endl;
-
 
     if (MatPlotShow) {
         //Matplot
@@ -104,26 +84,26 @@ int main() {
                                              {"marker",          "o"},
                                              {"markerfacecolor", "r"},
                                              {"markeredgecolor", "r"}});
-        if (res) {
-            resultLine2[0].emplace_back(res2->x() + (res2->x() - input.fixPoint.x()));
+        if (not res.empty()) {
+            resultLine2[0].emplace_back(res[1].x() + (res[1].x() - input.fixPoint.x()));
             resultLine2[0].emplace_back(input.fixPoint.x());
             resultLine[0].emplace_back(input.fixPoint.x());
-            resultLine[0].emplace_back(res->x() + (res->x() - input.fixPoint.x()));
+            resultLine[0].emplace_back(res[0].x() + (res[0].x() - input.fixPoint.x()));
 
-            resultLine2[1].emplace_back(res2->y() + (res2->y() - input.fixPoint.y()));
+            resultLine2[1].emplace_back(res[1].y() + (res[1].y() - input.fixPoint.y()));
             resultLine2[1].emplace_back(input.fixPoint.y());
             resultLine[1].emplace_back(input.fixPoint.y());
-            resultLine[1].emplace_back(res->y() + (res->y() - input.fixPoint.y()));
+            resultLine[1].emplace_back(res[0].y() + (res[0].y() - input.fixPoint.y()));
 
             auto color = "g";
-            if (calcDeterminate(Kernel::Vector_2(input.fixPoint, *res), Kernel::Vector_2(input.fixPoint, *res2)) > 0)
+            if (calcDeterminate(Kernel::Vector_2(input.fixPoint, res[0]), Kernel::Vector_2(input.fixPoint, res[1])) > 0)
                 color = "r";
 
             plt::plot(resultLine2[0], resultLine2[1], {{"linewidth", "1.5"},
                                                        {"color",     color}});
             plt::plot(resultLine[0], resultLine[1], {{"linewidth", "1.5"},
                                                      {"color",     color}});
-            std::cout << res->x() * res2->y() - res->y() * res2->x() << std::endl;
+            std::cout << res[0].x() * res[1].y() - res[0].y() * res[1].x() << std::endl;
 /*
             originLine[0].emplace_back(input.fixPoint.x());
             originLine[0].emplace_back(origin.x());
@@ -139,6 +119,8 @@ int main() {
             detLine[1].emplace_back(-fixToOrigin.y());
             plt::plot(detLine[0], detLine[1], {{"linewidth", "1.5"},{"color", "c"}});
 */
+/** deprecated quadtree visualisation**/
+/*
             std::stack<Quadtree::Node> stack;
             stack.push(quadtree.root());
             while (not stack.empty()) {
@@ -171,13 +153,32 @@ int main() {
                     stack.push(currentNode[3]);
                 }
             }
-
+*/
         }
         plt::show();
     }
 
     return 0;
 }
+
+std::vector<Kernel::Point_2>
+quadtreeScan(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint){
+    std::vector<Kernel::Point_2> res(2);
+
+    Quadtree quadtree(pointCloud);
+    quadtree.refine(10, 15);
+
+    Kernel::Point_2 const *res1 = findBoundaryPoint(quadtree, fixPoint, BS_LEFT);
+    if(res1 != nullptr){
+        res[0] = *res1;
+    }
+    Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, fixPoint, BS_RIGHT);
+    if(res2 != nullptr){
+        res[1] = *res2;
+    }
+    return res;
+}
+
 
 double cosTheta(Kernel::Vector_2 u, Kernel::Vector_2 v) {
     return u * v / (sqrt(u.squared_length()) * sqrt(v.squared_length()));

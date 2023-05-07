@@ -23,45 +23,26 @@ enum boundarySide {
 //function def
 Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side);
 
+std::vector<Kernel::Point_3>
+octreeScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet);
 
 int main() {
     auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-    /** Building the Octree **/
-
-    Octree octree(input.pointCloud);
-    octree.refine(10, 15);
-
-    std::chrono::steady_clock::time_point ocTreeFinish = std::chrono::steady_clock::now();
-
-    /** Solving the Problem here **/
-    //for index order see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-
-    Kernel::Point_3 const *res1 = findBoundaryPoint(octree, input.fixPointSet, BS_LEFT);
-    Kernel::Point_3 const *res2 = findBoundaryPoint(octree, input.fixPointSet, BS_RIGHT);
+    auto res = octreeScan(input.pointCloud, input.fixPointSet);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(ocTreeFinish - begin).count() << "[ms]"
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
               << std::endl;
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(ocTreeFinish - begin).count() << "[mircos]"
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
               << std::endl;
     std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(ocTreeFinish - begin).count() << "[ns]"
-              << std::endl;
-
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - ocTreeFinish).count() << "[ms]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - ocTreeFinish).count() << "[mircos]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - ocTreeFinish).count() << "[ns]"
+              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
               << std::endl;
 
     //std::cout << counter << std::endl;
@@ -91,19 +72,19 @@ int main() {
         fixPointSet[2].emplace_back(input.fixPointSet.first.z());
         fixPointSet[2].emplace_back(input.fixPointSet.second.z());
 
-        fixPointSet[0].emplace_back(res1->x());
+        fixPointSet[0].emplace_back(res[0].x());
         fixPointSet[0].emplace_back(input.fixPointSet.first.x());
-        fixPointSet[0].emplace_back(res2->x());
+        fixPointSet[0].emplace_back(res[1].x());
         fixPointSet[0].emplace_back(input.fixPointSet.second.x());
 
-        fixPointSet[1].emplace_back(res1->y());
+        fixPointSet[1].emplace_back(res[0].y());
         fixPointSet[1].emplace_back(input.fixPointSet.first.y());
-        fixPointSet[1].emplace_back(res2->y());
+        fixPointSet[1].emplace_back(res[1].y());
         fixPointSet[1].emplace_back(input.fixPointSet.second.y());
 
-        fixPointSet[2].emplace_back(res1->z());
+        fixPointSet[2].emplace_back(res[0].z());
         fixPointSet[2].emplace_back(input.fixPointSet.first.z());
-        fixPointSet[2].emplace_back(res2->z());
+        fixPointSet[2].emplace_back(res[1].z());
         fixPointSet[2].emplace_back(input.fixPointSet.second.z());
         plt::plot3(fixPointSet[0], fixPointSet[1], fixPointSet[2], {{"linewidth", "1.0"},
                                                                     {"color",     "g"}}, 1);
@@ -111,6 +92,28 @@ int main() {
     }
 
 }
+
+std::vector<Kernel::Point_3>
+octreeScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet){
+    std::vector<Kernel::Point_3> res(2);
+    /** Building the Octree **/
+
+    Octree octree(pointCloud);
+    octree.refine(10, 15);
+
+    /** Solving the Problem here **/
+
+    Kernel::Point_3 const *res1 = findBoundaryPoint(octree, fixPointSet, BS_LEFT);
+    if(res1 != nullptr){
+        res[0] = *res1;
+    }
+    Kernel::Point_3 const *res2 = findBoundaryPoint(octree, fixPointSet, BS_RIGHT);
+    if(res2 != nullptr){
+        res[1] = *res2;
+    }
+    return res;
+}
+
 
 double cosTheta3(Kernel::Vector_3 u, Kernel::Vector_3 v) {
     return u * v / (sqrt(u.squared_length()) * sqrt(v.squared_length()));

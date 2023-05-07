@@ -11,45 +11,17 @@ namespace plt = matplotlibcpp;
 
 //typedefs
 typedef CGAL::Polyhedron_3<Kernel> Polyhedron_3;
-typedef Kernel::Point_3 Point_3;
+
+std::vector<Kernel::Point_3>
+quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet);
 
 int main() {
     auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
-    input.pointCloud.emplace_back(input.fixPointSet.first);
-    input.pointCloud.emplace_back(input.fixPointSet.second);
+
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    auto res = quickhullScan(input.pointCloud, input.fixPointSet);
 
-    Polyhedron_3 poly;
-    // compute convex hull of non-collinear points
-    CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
-
-    Kernel::Point_3 res1;
-    Kernel::Point_3 res2;
-
-    bool resExists = false;
-    for (auto e = poly.halfedges_begin(); e != poly.halfedges_end(); e++) {
-        if (e->vertex()->point() == input.fixPointSet.first
-            and e->next()->vertex()->point() == input.fixPointSet.second) {
-            resExists = true;
-
-            //find first solution
-            auto f = e->facet_begin();
-            while (f->vertex()->point() == input.fixPointSet.first or
-                   f->vertex()->point() == input.fixPointSet.second)
-                f++;
-            res1 = f->vertex()->point();
-
-            //find second solution
-            f = e->next()->opposite()->facet_begin();
-            while (f->vertex()->point() == input.fixPointSet.first or
-                   f->vertex()->point() == input.fixPointSet.second)
-                f++;
-            res2 = f->vertex()->point();
-
-            break;
-        }
-    }
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
@@ -71,6 +43,8 @@ int main() {
             scatterPoints[2].emplace_back(p.z());
         }
 
+        Polyhedron_3 poly;
+        CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
 
         for (auto &p: poly.points()) {
             convexHull[0].emplace_back(p.x());
@@ -118,20 +92,20 @@ int main() {
         fixPointSet[2].emplace_back(input.fixPointSet.first.z());
         fixPointSet[2].emplace_back(input.fixPointSet.second.z());
 
-        if (resExists) {
-            fixPointSet[0].emplace_back(res1.x());
+        if (not res.empty()) {
+            fixPointSet[0].emplace_back(res[0].x());
             fixPointSet[0].emplace_back(input.fixPointSet.first.x());
-            fixPointSet[0].emplace_back(res2.x());
+            fixPointSet[0].emplace_back(res[1].x());
             fixPointSet[0].emplace_back(input.fixPointSet.second.x());
 
-            fixPointSet[1].emplace_back(res1.y());
+            fixPointSet[1].emplace_back(res[0].y());
             fixPointSet[1].emplace_back(input.fixPointSet.first.y());
-            fixPointSet[1].emplace_back(res2.y());
+            fixPointSet[1].emplace_back(res[1].y());
             fixPointSet[1].emplace_back(input.fixPointSet.second.y());
 
-            fixPointSet[2].emplace_back(res1.z());
+            fixPointSet[2].emplace_back(res[0].z());
             fixPointSet[2].emplace_back(input.fixPointSet.first.z());
-            fixPointSet[2].emplace_back(res2.z());
+            fixPointSet[2].emplace_back(res[1].z());
             fixPointSet[2].emplace_back(input.fixPointSet.second.z());
             plt::plot3(fixPointSet[0], fixPointSet[1], fixPointSet[2], {{"linewidth", "1.0"},
                                                                         {"color",     "g"}}, 1);
@@ -144,4 +118,46 @@ int main() {
         plt::show();
     }
 
+}
+
+std::vector<Kernel::Point_3>
+quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet){
+    std::vector<Kernel::Point_3> res(2);
+
+    pointCloud.emplace_back(fixPointSet.first);
+    pointCloud.emplace_back(fixPointSet.second);
+
+    Polyhedron_3 poly;
+    // compute convex hull of non-collinear points
+    CGAL::convex_hull_3(pointCloud.begin(), pointCloud.end(), poly);
+
+
+    bool resExists = false;
+    for (auto e = poly.halfedges_begin(); e != poly.halfedges_end(); e++) {
+        if (e->vertex()->point() == fixPointSet.first
+            and e->next()->vertex()->point() == fixPointSet.second) {
+            resExists = true;
+
+            //find first solution
+            auto f = e->facet_begin();
+            while (f->vertex()->point() == fixPointSet.first or
+                   f->vertex()->point() == fixPointSet.second)
+                f++;
+            res[0] = f->vertex()->point();
+
+            //find second solution
+            f = e->next()->opposite()->facet_begin();
+            while (f->vertex()->point() == fixPointSet.first or
+                   f->vertex()->point() == fixPointSet.second)
+                f++;
+            res[1] = f->vertex()->point();
+
+            break;
+        }
+    }
+
+    //remove fixpoint from pointCloud to restore its original state
+    pointCloud.pop_back();
+    pointCloud.pop_back();
+    return res;
 }
