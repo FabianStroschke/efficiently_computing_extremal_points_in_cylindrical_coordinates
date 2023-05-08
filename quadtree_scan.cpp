@@ -35,7 +35,7 @@ std::vector<Kernel::Point_2>
 quadtreeScan(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint);
 
 int main() {
-    auto input = generateInputVec2<Kernel::Point_2>(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec2(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
