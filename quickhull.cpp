@@ -122,7 +122,7 @@ int main() {
 
 std::vector<Kernel::Point_3>
 quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet){
-    std::vector<Kernel::Point_3> res(2);
+    std::vector<Kernel::Point_3> res;
 
     pointCloud.emplace_back(fixPointSet.first);
     pointCloud.emplace_back(fixPointSet.second);
@@ -143,14 +143,14 @@ quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_
             while (f->vertex()->point() == fixPointSet.first or
                    f->vertex()->point() == fixPointSet.second)
                 f++;
-            res[0] = f->vertex()->point();
+            res.emplace_back(f->vertex()->point());
 
             //find second solution
             f = e->next()->opposite()->facet_begin();
             while (f->vertex()->point() == fixPointSet.first or
                    f->vertex()->point() == fixPointSet.second)
                 f++;
-            res[1] = f->vertex()->point();
+            res.emplace_back(f->vertex()->point());
 
             break;
         }
