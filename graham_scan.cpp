@@ -33,7 +33,7 @@ int main() {
 
 std::vector<Kernel::Point_2>
 grahamScanVec2(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint){
-    std::vector<Kernel::Point_2> res(2);
+    std::vector<Kernel::Point_2> res;
     std::vector<Kernel::Point_2> out;
 
     pointCloud.push_back(
@@ -43,8 +43,8 @@ grahamScanVec2(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoi
 
     for (int i = 0; i < out.size(); i++) {
         if (out[i].x() == fixPoint.x() and out[i].y() == fixPoint.y()) {
-            res[0] = out[(i + out.size() - 1) % out.size()];
-            res[1] = out[(i + out.size() + 1) % out.size()];
+            res.emplace_back(out[(i + out.size() - 1) % out.size()]);
+            res.emplace_back(out[(i + out.size() + 1) % out.size()]);
             break;
         }
     }

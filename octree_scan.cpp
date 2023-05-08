@@ -95,7 +95,7 @@ int main() {
 
 std::vector<Kernel::Point_3>
 octreeScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet){
-    std::vector<Kernel::Point_3> res(2);
+    std::vector<Kernel::Point_3> res;
     /** Building the Octree **/
 
     Octree octree(pointCloud);
@@ -105,11 +105,11 @@ octreeScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,K
 
     Kernel::Point_3 const *res1 = findBoundaryPoint(octree, fixPointSet, BS_LEFT);
     if(res1 != nullptr){
-        res[0] = *res1;
+        res.emplace_back(*res1);
     }
     Kernel::Point_3 const *res2 = findBoundaryPoint(octree, fixPointSet, BS_RIGHT);
     if(res2 != nullptr){
-        res[1] = *res2;
+        res.emplace_back(*res2);
     }
     return res;
 }

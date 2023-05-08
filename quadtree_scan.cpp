@@ -163,18 +163,18 @@ int main() {
 
 std::vector<Kernel::Point_2>
 quadtreeScan(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint){
-    std::vector<Kernel::Point_2> res(2);
+    std::vector<Kernel::Point_2> res;
 
     Quadtree quadtree(pointCloud);
     quadtree.refine(10, 15);
 
     Kernel::Point_2 const *res1 = findBoundaryPoint(quadtree, fixPoint, BS_LEFT);
     if(res1 != nullptr){
-        res[0] = *res1;
+        res.emplace_back(*res1);
     }
     Kernel::Point_2 const *res2 = findBoundaryPoint(quadtree, fixPoint, BS_RIGHT);
     if(res2 != nullptr){
-        res[1] = *res2;
+        res.emplace_back(*res2);
     }
     return res;
 }
