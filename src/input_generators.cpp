@@ -9,7 +9,7 @@ generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim
     InputVec2 res;
 
     //generate point cloud and fixpoint
-    srand(seed);
+    if(seed != -1) srand(seed);
     int r = std::rand();
     double scale = 1;
 
@@ -41,7 +41,7 @@ generateInputVec3(int sample_size, int seed, fixPointLocation hint, size_t x_dim
     InputVec3 res;
 
     //generate point cloud and fixpoint
-    srand(seed);
+    if(seed != -1) srand(seed);
     int r = std::rand();
     int r2 = std::rand();
     double scale = 1;
@@ -124,5 +124,84 @@ InputVec3 readInputVec3(std::string path) {
     res.fixPointSet = {{0,0,0},{0,0,0}};
 
     return res;
+}
+
+void randomizeFixpointVec2(InputVec2 &inputs, fixPointLocation hint, int seed) {
+    Min_circle boundingSphere(inputs.pointCloud.begin(), inputs.pointCloud.end());
+    Kernel::Point_2 center = {boundingSphere.center_cartesian_begin()[0],boundingSphere.center_cartesian_begin()[1]};
+
+    if(seed != -1) srand(seed);
+    double r = boundingSphere.radius();
+    auto fixRand = rand();
+    switch (hint) {
+        case FPL_CONVEXHULL:
+            inputs.fixPoint = Kernel::Point_2(r*sin(fixRand)+center.x(), r*cos(fixRand)+center.y());
+            break;
+        case FPL_RANDOM:
+            inputs.fixPoint = Kernel::Point_2(r*sin(rand())+center.x(), r*cos(rand())+center.y());
+            break;
+        case FPL_USUALLY_INSIDE:
+            r /= 4;
+            inputs.fixPoint = Kernel::Point_2(r*sin(fixRand)+center.x(), r*cos(fixRand)+center.y());
+            break;
+        case FPL_CENTER:
+            inputs.fixPoint = Kernel::Point_2(0, 0);
+            break;
+    }
+}
+
+void randomizeFixpointVec3(InputVec3 &inputs, fixPointLocation hint, int seed) {
+    Min_sphere boundingSphere(inputs.pointCloud.begin(), inputs.pointCloud.end());
+    Kernel::Point_3 center = {boundingSphere.center_cartesian_begin()[0],boundingSphere.center_cartesian_begin()[1],boundingSphere.center_cartesian_begin()[2]};
+
+    if(seed != -1) srand(seed);
+    double r = boundingSphere.radius();
+    auto fixRand = rand();
+    auto fixRand2 = rand();
+    switch (hint) {
+        case FPL_CONVEXHULL: {
+            inputs.fixPointSet.first = Kernel::Point_3(
+                    sin(fixRand) * sin(fixRand2) * r + center.x(),
+                    cos(fixRand) * sin(fixRand2) * r + center.y(),
+                    cos(fixRand2) * r + center.z());
+            auto v = CGAL::cross_product(
+                    Kernel::Vector_3(inputs.fixPointSet.first, center),
+                    Kernel::Vector_3(std::rand(), std::rand(), std::rand()));
+            inputs.fixPointSet.second =
+                    inputs.fixPointSet.first + (v / sqrt(v.squared_length())) * r/4;
+            break;
+        }
+        case FPL_RANDOM: {
+            inputs.fixPointSet.first = Kernel::Point_3(
+                    r*sin(rand())+center.x(),
+                    r*sin(rand())+center.y(),
+                    r*sin(rand())+center.z());
+            auto v = CGAL::cross_product(
+                    Kernel::Vector_3(inputs.fixPointSet.first, {0, 0, 0}),
+                    Kernel::Vector_3(std::rand(), std::rand(), std::rand()));
+            inputs.fixPointSet.second =
+                    inputs.fixPointSet.first + (v / sqrt(v.squared_length())) * r/4;
+            break;
+        }
+        case FPL_USUALLY_INSIDE: {
+            inputs.fixPointSet.first = Kernel::Point_3(
+                    sin(fixRand) * sin(fixRand2) * r / 2 + center.x(),
+                    cos(fixRand) * sin(fixRand2) * r / 2 + center.y(),
+                    cos(fixRand2) * r / 2 + center.z());
+            auto v = CGAL::cross_product(
+                    Kernel::Vector_3(inputs.fixPointSet.first, {0, 0, 0}),
+                    Kernel::Vector_3(std::rand(), std::rand(), std::rand()));
+            inputs.fixPointSet.second =
+                    inputs.fixPointSet.first + (v / sqrt(v.squared_length())) * r / 4;
+            break;
+        }
+        case FPL_CENTER:
+            inputs.fixPointSet.first = Kernel::Point_3(
+                    r*sin(rand())+center.x(),
+                    r*sin(rand())+center.y(),
+                    r*sin(rand())+center.z());
+            inputs.fixPointSet.second = Kernel::Point_3(0, 0, 0);
+            break;
+    }
 }
 

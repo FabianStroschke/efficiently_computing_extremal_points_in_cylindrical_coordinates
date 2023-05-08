@@ -16,8 +16,8 @@ std::vector<Kernel::Point_3>
 quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet);
 
 int main() {
-    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
-
+    auto input = readInputVec3("../inputs/suzanne.obj");//generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
+    randomizeFixpointVec3(input, FPL_RANDOM, seed);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     auto res = quickhullScan(input.pointCloud, input.fixPointSet);
@@ -37,12 +37,14 @@ int main() {
         std::vector<std::vector<double>> fixPointSet(3);
         std::vector<std::vector<double>> convexHull(3);
 
+        input.pointCloud.emplace_back(input.fixPointSet.first);
+        input.pointCloud.emplace_back(input.fixPointSet.second);
+
         for (auto &p: input.pointCloud) {
             scatterPoints[0].emplace_back(p.x());
             scatterPoints[1].emplace_back(p.y());
             scatterPoints[2].emplace_back(p.z());
         }
-
         Polyhedron_3 poly;
         CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
 

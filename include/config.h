@@ -7,8 +7,9 @@
 
 #include <chrono>
 
+
 int sample_size = 100;
-int seed = std::time(nullptr);
+int seed = std::random_device{}();
 bool MatPlotShow = true;
 
 #endif //EXAMPLE_CONFIG_H

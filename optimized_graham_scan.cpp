@@ -12,12 +12,14 @@ std::vector<Kernel::Point_2>
 optimizedGrahamScanVec2(std::vector<Kernel::Point_2> &pointCloud, Kernel::Point_2 &fixPoint, bool show = false);
 
 int main() {
+    srand(seed);
+
     std::ofstream log;
     log.open("log.txt", std::ios::out | std::ios::app);
 
     //seed = std::time(nullptr)+i;
-    auto input = generateInputVec2(sample_size, seed, FPL_CONVEXHULL);
-
+    auto input = readInputVec2("../inputs/suzanne.obj");//generateInputVec2(sample_size, seed, FPL_CONVEXHULL);
+    randomizeFixpointVec2(input, FPL_CONVEXHULL);
     log << sample_size << ",";
     log_function_time(auto res = optimizedGrahamScanVec2(input.pointCloud, input.fixPoint, MatPlotShow), log);
     log << "\n";
@@ -84,8 +86,6 @@ std::vector<Kernel::Point_2> optimizedGrahamScanVec2(std::vector<Kernel::Point_2
                 line.second[1] = v.y();
                 //std::cout << k<<"\n";
                 plt::clf();
-                plt::ylim(-120, 120);
-                plt::xlim(-120, 120);
                 plt::plot(x, y, {{"linewidth",  "0.0"},
                                  {"marker",     "x"},
                                  {"markersize", "2.5"}});
