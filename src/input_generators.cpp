@@ -97,3 +97,32 @@ generateInputVec3(int sample_size, int seed, fixPointLocation hint, size_t x_dim
     }
     return res;
 }
+
+InputVec2 readInputVec2(std::string path) {
+    InputVec2 res;
+
+    std::vector<Kernel::Point_3> points;
+    std::vector<std::vector<std::size_t> > polygons;
+
+    CGAL::IO::read_polygon_soup(path, points, polygons);
+
+    for(auto &p:points){
+        res.pointCloud.emplace_back(p.x(), p.y());
+    }
+    res.fixPoint = {0,0};
+
+    return res;
+}
+
+InputVec3 readInputVec3(std::string path) {
+    InputVec3 res;
+
+    std::vector<std::vector<std::size_t> > polygons;
+
+    CGAL::IO::read_polygon_soup(path, res.pointCloud, polygons);
+
+    res.fixPointSet = {{0,0,0},{0,0,0}};
+
+    return res;
+}
+

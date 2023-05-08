@@ -9,6 +9,7 @@
 #include <ctime>
 #include "../external/glm/glm.hpp"
 #include "CGALSetup.h"
+#include <CGAL/IO/polygon_soup_io.h>
 
 
 enum fixPointLocation {
@@ -32,5 +33,8 @@ InputVec2 generateInputVec2(int sample_size, int seed = std::time(nullptr), fixP
 
 InputVec3 generateInputVec3(int sample_size, int seed = std::time(nullptr), fixPointLocation hint = FPL_RANDOM,
                             size_t x_dim = 100, size_t y_dim = 100, size_t z_dim = 100);
+
+InputVec2 readInputVec2(std::string path);
+InputVec3 readInputVec3(std::string path);
 
 #endif //EXAMPLE_INPUT_GENERATORS_H
