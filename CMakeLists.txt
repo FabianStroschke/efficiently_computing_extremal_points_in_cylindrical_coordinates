@@ -59,3 +59,5 @@ target_link_libraries(octreeScan
         Python::Module
         Python::NumPy
         )
+
+add_subdirectory(Google_tests)
