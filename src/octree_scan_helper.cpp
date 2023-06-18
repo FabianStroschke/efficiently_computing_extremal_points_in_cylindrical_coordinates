@@ -120,7 +120,7 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
         } else {
             //for index see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
             int idx = findBoundaryCell(octree.bbox(currentNode), origin, fixPointSet, side, angle);
-            if(idx >0) { //TODO >=0?
+            if(idx >=0) {
                 stack.push(currentNode[idx ^ 7]); //flip x,y,z    //opposite corner of idx
                 stack.push(currentNode[idx ^ 6]); //flip y,z      //adjacent to opposite corner
                 stack.push(currentNode[idx ^ 5]); //flip x,z      //adjacent to opposite corner
