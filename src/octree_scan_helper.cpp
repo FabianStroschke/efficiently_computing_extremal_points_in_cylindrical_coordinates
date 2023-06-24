@@ -100,8 +100,10 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
     while (not stack.empty()) {
         auto currentNode = stack.top();
         stack.pop();
+        if (currentNode.size() == 0) continue;
         if (currentNode.is_leaf()) {
             for (auto const &p: currentNode) {
+                if(p == fixPointSet.first or p == fixPointSet.second) continue;
                 double angle2 = orientedAngleBetweenPlanes({fixPointSet.first,fixPointSet.second, p},fixToOrigin,normal);
                 switch (side) {
                     case BS_LEFT: //find negative angle with the biggest absolute value
