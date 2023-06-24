@@ -8,10 +8,7 @@
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>
 
-#include "external/matplotlibcpp/matplotlibcpp.h"
-
-//namespaces
-namespace plt = matplotlibcpp;
+#include "matplot_helper.h"
 
 //typedefs
 typedef Kernel::Point_3 Point_3;
@@ -80,8 +77,22 @@ int main() {
         fixPointSet[2].emplace_back(input.fixPointSet.first.z());
         fixPointSet[2].emplace_back(res[1].z());
         fixPointSet[2].emplace_back(input.fixPointSet.second.z());
+
         plt::plot3(fixPointSet[0], fixPointSet[1], fixPointSet[2], {{"linewidth", "1.0"},
                                                                     {"color",     "g"}}, 1);
+        std::vector<std::vector<double>> solution(3);
+        solution[0].emplace_back(55.1132);
+        solution[1].emplace_back(-0.532351);
+        solution[2].emplace_back(12.9694);
+
+        plt::plot3(solution[0], solution[1], solution[2], {{"linewidth",  "0.0"},
+                                                                          {"marker",     "o"},
+                                                                          {"markersize", "1.5"}}, 1);
+        Octree octree(input.pointCloud);
+        octree.refine(10, 15);
+        matplotOctree ot(octree);
+        ot.show();
+
         plt::show();
     }
 
