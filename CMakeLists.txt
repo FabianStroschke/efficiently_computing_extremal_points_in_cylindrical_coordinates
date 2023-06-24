@@ -27,6 +27,7 @@ add_executable(grahamScan graham_scan.cpp src/input_generators.cpp)
 add_executable(quadtreeScan quadtree_scan.cpp src/input_generators.cpp)
 add_executable(quickhull quickhull.cpp src/input_generators.cpp)
 add_executable(octreeScan octree_scan.cpp src/input_generators.cpp src/octree_scan_helper.cpp)
+add_executable(octreeWrap octree_gift_wrapping.cpp src/input_generators.cpp src/octree_scan_helper.cpp src/octreeWrap.cpp)
 
 #link main
 target_link_libraries(optimizedGrahamScan
@@ -55,6 +56,12 @@ target_link_libraries(quickhull
         )
 target_link_libraries(octreeScan CGAL::CGAL CGAL::CGAL_Core)
 target_link_libraries(octreeScan
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )
+target_link_libraries(octreeWrap CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(octreeWrap
         Python::Python
         Python::Module
         Python::NumPy
