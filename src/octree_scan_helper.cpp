@@ -2,6 +2,7 @@
 // Created by fabia on 18.06.2023.
 //
 #include "octree_scan_helper.h"
+#include <CGAL/intersections.h>
 
 double cosTheta3(Kernel::Vector_3 u, Kernel::Vector_3 v) {
     return u * v / (sqrt(u.squared_length()) * sqrt(v.squared_length()));
@@ -93,6 +94,7 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
 
     std::stack<Octree::Node> stack;
     stack.push(octree.root());
+    CGAL::Line_3<Kernel> line(fixPointSet.first, fixPointSet.second);
 
 
     while (not stack.empty()) {
@@ -119,7 +121,10 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
             }
         } else {
             //for index see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-            int idx = findBoundaryCell(octree.bbox(currentNode), origin, fixPointSet, side, angle);
+            int idx = 0;
+            if(not CGAL::intersection(line, octree.bbox(currentNode))){
+                idx = findBoundaryCell(octree.bbox(currentNode), origin, fixPointSet, side, angle);
+            }
             if(idx >=0) {
                 stack.push(currentNode[idx ^ 7]); //flip x,y,z    //opposite corner of idx
                 stack.push(currentNode[idx ^ 6]); //flip y,z      //adjacent to opposite corner
