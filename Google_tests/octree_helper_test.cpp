@@ -11,14 +11,14 @@
 //typedefs
 typedef CGAL::Polyhedron_3<Kernel> Polyhedron_3;
 
-TEST(FindBoundaryTestSuite, ConvexHull){
+void testFindBoundary(long seed, long nPoints, int bucketSize){
 
     //generate input
-    auto input = generateInputVec3(500, 1404, FPL_CONVEXHULL);
+    auto input = generateInputVec3(nPoints, 12345, FPL_CONVEXHULL);
 
     //build octree
     Octree octree(input.pointCloud);
-    octree.refine(10, 5);
+    octree.refine(10, bucketSize);
 
     //build convex hull
     Polyhedron_3 poly;
@@ -41,7 +41,7 @@ TEST(FindBoundaryTestSuite, ConvexHull){
             for (int i = 0; i < 3; ++i) {
                 auto res = findBoundaryPoint(octree, {vertices[i],vertices[(i+1)%3]},BS_LEFT);
                 if(res != nullptr){
-                    EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution.";
+                    EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"}";
                     if(*res == vertices[(i+2)%3]){
                         tests_complete++;
                     }else{
@@ -57,8 +57,69 @@ TEST(FindBoundaryTestSuite, ConvexHull){
         }
     }
     std::cout << "Total Test:     " << tests_total
-            << "\nTests Completed:" << tests_complete
-            << "\nTests Failed:   " << tests_failed
-            << "\nTests NAN:      " << tests_nan;
+              << "\nTests Completed:" << tests_complete
+              << "\nTests Failed:   " << tests_failed
+              << "\nTests NAN:      " << tests_nan;
 }
+
+TEST(FindBoundary, C5B1){
+    testFindBoundary(1404,5,1);
+}
+TEST(FindBoundary, C5B5){
+    testFindBoundary(1404,5,5);
+}
+
+TEST(FindBoundary, C50B1){
+    testFindBoundary(1404,50,1);
+}
+TEST(FindBoundary, C50B5){
+    testFindBoundary(1404,50,5);
+}
+TEST(FindBoundary, C50B15){
+    testFindBoundary(1404,50,15);
+}
+TEST(FindBoundary, C50B50){
+    testFindBoundary(1404,50,50);
+}
+
+TEST(FindBoundary, C500B1){
+    testFindBoundary(1404,500,1);
+}
+TEST(FindBoundary, C500B5){
+    testFindBoundary(1404,500,5);
+}
+TEST(FindBoundary, C500B15){
+    testFindBoundary(1404,500,15);
+}
+TEST(FindBoundary, C500B50){
+    testFindBoundary(1404,500,50);
+}
+
+TEST(FindBoundary, C5000B1){
+    testFindBoundary(1404,500,1);
+}
+TEST(FindBoundary, C5000B5){
+    testFindBoundary(1404,500,5);
+}
+TEST(FindBoundary, C5000B15){
+    testFindBoundary(1404,500,15);
+}
+TEST(FindBoundary, C5000B50){
+    testFindBoundary(1404,500,50);
+}
+
+
+TEST(FindBoundary, C50000B1){
+    testFindBoundary(1404,500,1);
+}
+TEST(FindBoundary, C50000B5){
+    testFindBoundary(1404,500,5);
+}
+TEST(FindBoundary, C50000B15){
+    testFindBoundary(1404,500,15);
+}
+TEST(FindBoundary, C50000B50){
+    testFindBoundary(1404,500,50);
+}
+
 
