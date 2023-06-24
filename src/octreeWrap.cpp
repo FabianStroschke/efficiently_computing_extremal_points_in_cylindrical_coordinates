@@ -7,6 +7,8 @@
 void
 octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
 
+    if(pointCloud.empty()) return;
+
     std::vector<Kernel::Point_3> res;
     /** Building the Octree **/
 
