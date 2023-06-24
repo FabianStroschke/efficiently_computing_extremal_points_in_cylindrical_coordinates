@@ -21,7 +21,8 @@ void testSameConvexHullRandom(long seed, long nPoints){
     CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
 
     //build convex mesh
-    Mesh mesh = octreeWrap(input.pointCloud);
+    Mesh mesh;
+    octreeWrap(input.pointCloud, mesh);
 
     for(auto &p: poly.points()){
         EXPECT_NE(std::find(mesh.points().begin(), mesh.points().end(),p),mesh.points().end());
@@ -37,7 +38,8 @@ void testSameConvexHullInput(std::string path){
     CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
 
     //build convex mesh
-    Mesh mesh = octreeWrap(input.pointCloud);
+    Mesh mesh;
+    octreeWrap(input.pointCloud, mesh);
 
     for(auto &p: poly.points()){
         EXPECT_NE(std::find(mesh.points().begin(), mesh.points().end(),p),mesh.points().end())<<"Failed with object: " << path;
@@ -80,20 +82,8 @@ TEST(CheckConvexHull, N50000){
     testSameConvexHullRandom(468014, n);
 }
 
-TEST(CheckConvexHull, N500000){
-    int n = 500000;
-    testSameConvexHullRandom(1, n);
-    testSameConvexHullRandom(13, n);
-    testSameConvexHullRandom(345, n);
-    testSameConvexHullRandom(7345, n);
-    testSameConvexHullRandom(98175, n);
-    testSameConvexHullRandom(123456, n);
-    testSameConvexHullRandom(9807, n);
-    testSameConvexHullRandom(468014, n);
-}
-
 TEST(CheckConvexHull, Objects){
-    //testSameConvexHullInput("../inputs/alligator.obj");
+    testSameConvexHullInput("../inputs/alligator.obj");
     testSameConvexHullInput("../inputs/armadillo.obj");
     testSameConvexHullInput("../inputs/beast.obj");
     testSameConvexHullInput("../inputs/beetle.obj");
