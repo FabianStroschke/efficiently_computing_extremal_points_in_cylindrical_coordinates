@@ -3,7 +3,7 @@
 //
 #include "include/input_generators.h"
 #include "include/config.h"
-#include "include/octree_scan_helper.h"
+#include "include/tree_scan_helper.h"
 
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>

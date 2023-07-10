@@ -2,8 +2,8 @@
 // Created by fabia on 16.06.2023.
 //
 
-#ifndef EXAMPLE_OCTREE_SCAN_HELPER_H
-#define EXAMPLE_OCTREE_SCAN_HELPER_H
+#ifndef EXAMPLE_TREE_SCAN_HELPER_H
+#define EXAMPLE_TREE_SCAN_HELPER_H
 
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>
@@ -26,4 +26,4 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
 Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side);
 
 
-#endif //EXAMPLE_OCTREE_SCAN_HELPER_H
+#endif //EXAMPLE_TREE_SCAN_HELPER_H

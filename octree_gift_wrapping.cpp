@@ -3,7 +3,7 @@
 //
 #include "input_generators.h"
 #include "config.h"
-#include "octreeWrap.h"
+#include "octree_wrap.h"
 
 
 #include "external/matplotlibcpp/matplotlibcpp.h"

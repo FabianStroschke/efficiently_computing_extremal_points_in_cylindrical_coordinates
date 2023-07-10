@@ -1,7 +1,7 @@
 //
 // Created by fabia on 18.06.2023.
 //
-#include "octree_scan_helper.h"
+#include "tree_scan_helper.h"
 #include <CGAL/intersections.h>
 
 double cosTheta3(Kernel::Vector_3 u, Kernel::Vector_3 v) {

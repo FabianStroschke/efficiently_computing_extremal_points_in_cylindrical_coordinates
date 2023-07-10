@@ -27,7 +27,7 @@ add_executable(grahamScan graham_scan.cpp src/input_generators.cpp)
 add_executable(quadtreeScan quadtree_scan.cpp src/input_generators.cpp)
 add_executable(quickhull quickhull.cpp src/input_generators.cpp)
 add_executable(octreeScan octree_scan.cpp src/input_generators.cpp src/octree_scan_helper.cpp)
-add_executable(octreeWrap octree_gift_wrapping.cpp src/input_generators.cpp src/octree_scan_helper.cpp src/octreeWrap.cpp)
+add_executable(octreeWrap octree_gift_wrapping.cpp src/input_generators.cpp src/octree_scan_helper.cpp src/octree_wrap.cpp)
 
 #link main
 target_link_libraries(optimizedGrahamScan

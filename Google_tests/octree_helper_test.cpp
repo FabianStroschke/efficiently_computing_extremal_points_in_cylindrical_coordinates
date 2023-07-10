@@ -2,7 +2,7 @@
 // Created by fabia on 18.06.2023.
 //
 #include "gtest/gtest.h"
-#include "octree_scan_helper.h"
+#include "tree_scan_helper.h"
 #include "input_generators.h"
 
 #include <CGAL/Polyhedron_3.h>

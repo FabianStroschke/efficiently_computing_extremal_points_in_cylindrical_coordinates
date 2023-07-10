@@ -2,7 +2,7 @@
 // Created by fabia on 22.06.2023.
 //
 
-#include "octreeWrap.h"
+#include "octree_wrap.h"
 
 void
 octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
