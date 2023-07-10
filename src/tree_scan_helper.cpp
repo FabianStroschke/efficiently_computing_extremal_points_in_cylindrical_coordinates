@@ -70,10 +70,10 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
     return index;
 }
 
-Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side){
+Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side){
     Kernel::Point_3 const *res = nullptr;
 
-    auto bbox = octree.bbox(octree.root());
+    auto bbox = tree.bbox(tree.root());
     Kernel::Point_3 origin((bbox.xmax() + bbox.xmin()) / 2, (bbox.ymax() + bbox.ymin()) / 2, (bbox.zmax() + bbox.zmin()) / 2);
 
     //TODO: extract from findBoundaryCell (?)
@@ -93,7 +93,7 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
     std::vector<int> quadrantOrder = {0, 1, 3, 2};
 
     std::stack<Octree::Node> stack;
-    stack.push(octree.root());
+    stack.push(tree.root());
     CGAL::Line_3<Kernel> line(fixPointSet.first, fixPointSet.second);
 
 
@@ -124,8 +124,8 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &octree, const std::pair<K
         } else {
             //for index see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
             int idx = 0;
-            if(not CGAL::intersection(line, octree.bbox(currentNode))){
-                idx = findBoundaryCell(octree.bbox(currentNode), origin, fixPointSet, side, angle);
+            if(not CGAL::intersection(line, tree.bbox(currentNode))){
+                idx = findBoundaryCell(tree.bbox(currentNode), origin, fixPointSet, side, angle);
             }
             if(idx >=0) {
                 stack.push(currentNode[idx ^ 7]); //flip x,y,z    //opposite corner of idx
