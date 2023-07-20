@@ -142,3 +142,89 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
     return res;
 
 }
+
+Kernel::Point_3 const *findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side){
+    Kernel::Point_3 const *res = nullptr;
+
+    const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& box(tree.bounding_box());
+    Kernel::Point_3 origin((box.max_coord(0) + box.min_coord(0)) / 2, (box.max_coord(1) + box.min_coord(1)) / 2, (box.max_coord(2) + box.min_coord(2)) / 2);
+
+    Kernel::Plane_3 fixToOrigin(fixPointSet.first,fixPointSet.second, origin);
+    Kernel::Vector_3 normal(fixPointSet.first,fixPointSet.second); //vector along rotation axis
+    normal /= sqrt(normal.squared_length());
+
+    double angle = 0;
+    switch (side) {
+        case BS_LEFT:
+            angle = M_PI;
+            break;
+        case BS_RIGHT:
+            angle = -M_PI;
+            break;
+    }
+    std::vector<int> quadrantOrder = {0, 1, 3, 2};
+
+    typedef std::pair<Kd_tree::Node_const_handle,CGAL::Kd_tree_rectangle<double, Traits::Dimension>> node_bbox_pair;
+    std::stack<node_bbox_pair> stack;
+    stack.push(node_bbox_pair(tree.root(), tree.bounding_box()));
+    CGAL::Line_3<Kernel> line(fixPointSet.first, fixPointSet.second);
+
+
+    while (not stack.empty()) {
+        auto currentPair = stack.top();
+        stack.pop();
+        if (currentPair.first->is_leaf()) {
+            auto node = static_cast<Kd_tree::Leaf_node_const_handle>(currentPair.first);
+            for (const auto & p : *node) {
+                if(p == fixPointSet.first or p == fixPointSet.second) continue;
+                double angle2 = orientedAngleBetweenPlanes({fixPointSet.first,fixPointSet.second, p},fixToOrigin,normal);
+                switch (side) {
+                    case BS_LEFT: //find negative angle with the biggest absolute value
+                        if (angle > angle2) {
+                            angle = angle2;
+                            res = &p;
+                        }
+                        break;
+                    case BS_RIGHT: //find positive angle with the biggest absolute value
+                        if (angle < angle2) {
+                            angle = angle2;
+                            res = &p;
+                        }
+                        break;
+                }
+            }
+        } else {
+            auto node = static_cast<Kd_tree::Internal_node_const_handle>(currentPair.first);
+            CGAL::Bbox_3 bbox(currentPair.second.min_coord(0),currentPair.second.min_coord(1),currentPair.second.min_coord(2),
+                              currentPair.second.max_coord(0),currentPair.second.max_coord(1),currentPair.second.max_coord(2));
+            int idx = 0;
+            if(not CGAL::intersection(line, bbox)){
+                idx = findBoundaryCell(bbox, origin, fixPointSet, side, angle);
+            }
+            if(idx >=0) {
+                CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_upper(currentPair.second);
+                CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_lower(currentPair.second);
+                node->split_bbox(bbox_lower, bbox_upper);
+                //if idx corner is the max value along the cutting dimension, push lower() than upper()
+
+                /** idx is a bit code for a corner, see here: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
+                 *  Example:
+                 *      idx = 6 == 110b; cutting_dimension = 1;
+                 *      0 == 110b & (1<<1)
+                 *      => 0 == 110b & 010b
+                 *      => 0 == 010b => false
+                 *      corner 6 on the y-max side of the box, therefor bbox_upper should be evaluated first aka pushed last on the stack (upper contains all y-max corners)
+                 **/
+                if(0==(idx&(1<<node->cutting_dimension()))){
+                    stack.push(node_bbox_pair(node->upper(), bbox_upper));
+                    stack.push(node_bbox_pair(node->lower(), bbox_lower));
+                }else{
+                    stack.push(node_bbox_pair(node->lower(), bbox_lower));
+                    stack.push(node_bbox_pair(node->upper(), bbox_upper));
+                }
+            }
+        }
+    }
+    return res;
+
+}
