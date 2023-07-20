@@ -10,10 +10,15 @@
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>
 
+#include <CGAL/Kd_tree.h>
+#include <CGAL/Search_traits_3.h>
+
 #include "../external/matplotlibcpp/matplotlibcpp.h"
 
 
 typedef Kernel::Point_3 Point_3;
+typedef CGAL::Search_traits_3<Kernel >  Traits;
+typedef CGAL::Kd_tree<Traits> Kd_tree;
 
 namespace plt = matplotlibcpp;
 
@@ -101,6 +106,94 @@ public:
                 stack.push(currentNode[5]);
                 stack.push(currentNode[6]);
                 stack.push(currentNode[7]);
+            }
+        }
+    }
+    void show(){
+        for(auto &b: boxes){
+            plt::plot3(b.x, b.y, b.z, {{"linewidth",  "0.5"}, {"color", "y"}}, 1);
+        }
+    }
+};
+
+class matplotKDtree{
+private:
+    std::vector<matplotArray> boxes;
+    void addBox(CGAL::Bbox_3 bbox){
+        boxes.emplace_back();
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.max(2)});
+
+
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+
+
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.max(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.min(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.max(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.max(1), bbox.min(2)});
+        boxes.back().addPoint({bbox.min(0), bbox.min(1), bbox.min(2)});
+    }
+public:
+    matplotKDtree(Kd_tree & tree){
+
+        typedef std::pair<Kd_tree::Node_const_handle,CGAL::Kd_tree_rectangle<double, Traits::Dimension>> node_bbox_pair;
+        std::stack<node_bbox_pair> stack;
+        stack.push(node_bbox_pair(tree.root(), tree.bounding_box()));
+
+        while (not stack.empty()) {
+            auto currentPair = stack.top();
+            stack.pop();
+            if (currentPair.first->is_leaf()) {
+                addBox({currentPair.second.min_coord(0), currentPair.second.min_coord(1),
+                        currentPair.second.min_coord(2),
+                        currentPair.second.max_coord(0), currentPair.second.max_coord(1),
+                        currentPair.second.max_coord(2)});
+            } else {
+                auto node = static_cast<Kd_tree::Internal_node_const_handle>(currentPair.first);
+                CGAL::Bbox_3 bbox(currentPair.second.min_coord(0),currentPair.second.min_coord(1),currentPair.second.min_coord(2),
+                                  currentPair.second.max_coord(0),currentPair.second.max_coord(1),currentPair.second.max_coord(2));
+                CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_upper(currentPair.second);
+                CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_lower(currentPair.second);
+                node->split_bbox(bbox_lower, bbox_upper);
+
+                stack.push(node_bbox_pair(node->upper(), bbox_upper));
+                stack.push(node_bbox_pair(node->lower(), bbox_lower));
+
+                addBox({currentPair.second.min_coord(0), currentPair.second.min_coord(1),
+                        currentPair.second.min_coord(2),
+                        currentPair.second.max_coord(0), currentPair.second.max_coord(1),
+                        currentPair.second.max_coord(2)});
+
             }
         }
     }
