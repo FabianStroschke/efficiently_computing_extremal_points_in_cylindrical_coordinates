@@ -79,6 +79,11 @@ void testFindBoundaryKD(long seed, long nPoints){
     long tests_complete = 0;
     long tests_nan = 0;
 
+    Kernel::Point_3 origin(0,0,0);
+    for(auto &p: kd_tree){
+        origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
+    }
+
     //iterate over faces
     for(auto it = poly.facets_begin(); it != poly.facets_end(); it++){
         auto face_iterator = *it->facet_begin();
@@ -90,9 +95,9 @@ void testFindBoundaryKD(long seed, long nPoints){
                     face_iterator.next()->next()->vertex()->point()
             };
             for (int i = 0; i < 3; ++i) {
-                auto res = findBoundaryPoint(kd_tree, {vertices[i],vertices[(i+1)%3]},BS_LEFT);
+                auto res = findBoundaryPoint(kd_tree, {vertices[i], vertices[(i + 1) % 3]}, BS_LEFT, origin);
                 if(res != nullptr){
-                    EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"} Seed: "<< seed;
+                    EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"} Seed: "<< seed << " Size: " <<kd_tree.size();
                     if(*res == vertices[(i+2)%3]){
                         tests_complete++;
                     }else{

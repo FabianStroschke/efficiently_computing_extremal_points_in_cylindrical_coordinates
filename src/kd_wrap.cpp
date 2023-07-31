@@ -32,6 +32,11 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     std::cout << "Time difference = "
               << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
               << std::endl;
+    
+    Kernel::Point_3 origin(0,0,0);
+    for(auto &p: kd_tree){
+        origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
+    }
 
     //find first face
     //CGAL::Kd_tree_rectangle<Traits::FT,CGAL::internal::Get_dimension_tag<Traits>::Dimension>
@@ -40,11 +45,12 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
              {bbox.max_coord(0),bbox.max_coord(1),bbox.max_coord(2)}
             ,{bbox.max_coord(0),bbox.max_coord(1),bbox.min_coord(2)}
     }; //TODO replace with halfedge
-    set.first = *findBoundaryPoint(kd_tree, set, BS_RIGHT);
-    set.second = *findBoundaryPoint(kd_tree, set, BS_RIGHT);
+    set.first = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
+    set.second = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
 
     //add face to mesh
-    CGAL::SM_Face_index f = m.add_face(m.add_vertex(set.first), m.add_vertex(set.second), m.add_vertex(*findBoundaryPoint(kd_tree, set, BS_RIGHT)));
+    CGAL::SM_Face_index f = m.add_face(m.add_vertex(set.first), m.add_vertex(set.second), m.add_vertex(*findBoundaryPoint(
+            kd_tree, set, BS_RIGHT, origin)));
     for(auto &e: m.halfedges_around_face(m.halfedge(f))){
         if(m.is_border(m.opposite(e))) borderEdges.push_back(m.opposite(e));
     }
@@ -56,7 +62,7 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             auto t = m.point(m.target(h));
             auto s = m.point(m.source(h));
 
-            auto p = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT);
+            auto p = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
 
             if(p == nullptr) {//TODO shouldn't happen, throw exception (if it happens s and t arent on the convex hull or the program is broken)
                 continue;

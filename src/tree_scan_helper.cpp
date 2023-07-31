@@ -143,11 +143,12 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
 
 }
 
-Kernel::Point_3 const *findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side){
+Kernel::Point_3 const *
+findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+                  boundarySide side, Kernel::Point_3 origin) {
     Kernel::Point_3 const *res = nullptr;
 
     const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& box(tree.bounding_box());
-    Kernel::Point_3 origin((box.max_coord(0) + box.min_coord(0)) / 2, (box.max_coord(1) + box.min_coord(1)) / 2, (box.max_coord(2) + box.min_coord(2)) / 2);
 
     Kernel::Plane_3 fixToOrigin(fixPointSet.first,fixPointSet.second, origin);
     Kernel::Vector_3 normal(fixPointSet.first,fixPointSet.second); //vector along rotation axis
