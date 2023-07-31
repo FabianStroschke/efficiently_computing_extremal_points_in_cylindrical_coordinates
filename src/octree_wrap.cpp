@@ -12,10 +12,25 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     std::vector<Kernel::Point_3> res;
     /** Building the Octree **/
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     Octree octree(pointCloud);
-    octree.refine(10, 15);
+    octree.refine(100, 15000000);
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     /** Solving the Problem here **/
+
+    std::cout << "Time difference = "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
+              << std::endl;
+    std::cout << "Time difference = "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
+              << std::endl;
+    std::cout << "Time difference = "
+              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
+              << std::endl;
+
     std::vector<CGAL::SM_Halfedge_index> borderEdges;
 
     //find first face

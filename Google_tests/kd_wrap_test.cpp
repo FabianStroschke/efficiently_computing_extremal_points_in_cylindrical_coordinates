@@ -46,6 +46,11 @@ void testSameConvexHullInputKD(std::string path){
     }
 }
 
+TEST(CheckConvexHullKD, N10){
+    int n = 10;
+    testSameConvexHullRandomKD(790, n);
+}
+
 TEST(CheckConvexHullKD, N500){
     int n = 500;
     testSameConvexHullRandomKD(1, n);

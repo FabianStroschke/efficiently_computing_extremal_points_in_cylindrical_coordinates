@@ -8,8 +8,8 @@
 #include <chrono>
 
 
-int sample_size = 100;
-int seed = std::random_device{}();
+int sample_size = 1000000;
+int seed = 12345;//std::random_device{}();
 bool MatPlotShow = true;
 
 #endif //EXAMPLE_CONFIG_H

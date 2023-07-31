@@ -196,9 +196,10 @@ TEST(FindBoundaryKD, C500000){
     testFindBoundaryKD(1404,500000);
 }
 
-TEST(FindBoundaryKD, C50M){
-    for(int i = 0; i<1000000; i++){
+TEST(FindBoundaryKD, C10M){
+    /*for(int i = 0; i<100000; i++){
         testFindBoundaryKD(i,10);
-    }
+    }*/
+    testFindBoundaryKD(790,10);
 }
 

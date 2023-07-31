@@ -10,7 +10,7 @@
 #include "matplot_helper.h"
 
 int main() {
-    auto input = generateInputVec3(50,66, FPL_CONVEXHULL);
+    auto input = generateInputVec3(10,790, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -81,27 +81,34 @@ int main() {
             edges.push_back(edge);
             plt::plot3(edges.back().x, edges.back().y, edges.back().z, {{"linewidth", "0.5"},
                                                                         {"color",     "c"}}, 1);
-
-
         }
+        /*for (auto e = res.halfedges_begin(); e != res.halfedges_end(); e++) {
+            matplotArray edge;
+            edge.addPoint(res.points()[res.target(*e)]);
+            edge.addPoint(res.points()[res.source(*e)]);
+            edges.push_back(edge);
+            plt::plot3(edges.back().x, edges.back().y, edges.back().z, {{"linewidth", "0.5"},
+                                                                        {"color",     "c"}}, 1);
+        }*/
 
         Kd_tree kd_tree(input.pointCloud.begin(),input.pointCloud.end(),Kd_tree::Splitter(1));
         kd_tree.build();
         matplotKDtree treeBoxes(kd_tree);
-        //treeBoxes.show();
-
-        problemEdges.addPoint({-7.8092752464774433, 31.225320294365883, 19.627871754554246});
-        problemEdges.addPoint({35.072180730027412, -5.6753827417977991, -55.331917295176702});
-        problemEdges.addPoint({-14.8482, 51.9199, -2.55789});
+        treeBoxes.show();
 
 
-        problemEdges.addPoint({35.072180730027412, -5.6753827417977991, -55.331917295176702});
-        problemEdges.addPoint({-7.8092752464774433, 31.225320294365883, 19.627871754554246});
-        problemEdges.addPoint({3.93538, 0.0425144, 37.6778});
+        Kernel::Point_3 origin(0,0,0);
+        for(auto &p: kd_tree){
+            origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
+        }
 
-        problemPoints.addPoint({0.589499, -3.77091, -38.5859});
-        problemPoints.addPoint({0.0494749, -0.0893824, -53.1999});
-        problemPoints.addPoint({(kd_tree.bounding_box().max_coord(0) + kd_tree.bounding_box().min_coord(0)) / 2, (kd_tree.bounding_box().max_coord(1) + kd_tree.bounding_box().min_coord(1)) / 2, (kd_tree.bounding_box().max_coord(2) + kd_tree.bounding_box().min_coord(2)) / 2});
+
+        problemEdges.addPoint({-36.258379764854524, -4.1599316927573398, 3.0090613243501325});
+        problemEdges.addPoint({-0.53957021850918252, -3.8692498521924357, 65.679343979892749});
+        problemEdges.addPoint({-12.812, -7.90927, 32.1854});
+
+        problemPoints.addPoint({10.7977, -34.6158, -10.2332});
+        problemPoints.addPoint(origin);
 
 
         plt::plot3(problemEdges.x, problemEdges.y, problemEdges.z, {{"linewidth",  "0.0"},
