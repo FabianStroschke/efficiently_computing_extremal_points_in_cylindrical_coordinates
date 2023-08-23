@@ -37,32 +37,20 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
     }
 
     int index = 0;
-    double maxAngle = 0;
+    auto bestAngles = std::minmax_element(angle, angle+8);
 
     switch (side) {
-        case BS_LEFT:
-            maxAngle = M_PI;
-            for (int i = 0; i < 8; i++) {
-                if (maxAngle > angle[i]) {
-                    index = i;
-                    maxAngle = angle[i];
-                }
-            }
-
-            if (minAngle < maxAngle) {
+        case BS_LEFT: //"smallest" angle
+            index = bestAngles.first - angle;
+            if (*bestAngles.first > minAngle and not(*bestAngles.first <= 0 and *bestAngles.second >= 0)){
                 index = -1;
             }
             break;
-        case BS_RIGHT:
-            maxAngle = -M_PI;
-            for (int i = 0; i < 8; i++) {
-                if (maxAngle < angle[i]) {
-                    index = i;
-                    maxAngle = angle[i];
-                }
-            }
+        case BS_RIGHT: //"biggest" angle
 
-            if (minAngle > maxAngle) {
+
+            index = bestAngles.second - angle;
+            if (*bestAngles.second < minAngle and not(*bestAngles.first <= 0 and *bestAngles.second >= 0)){
                 index = -1;
             }
             break;
