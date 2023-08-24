@@ -4,6 +4,38 @@
 
 #include "input_generators.h"
 
+InputVec2
+generateInputVec2(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim) {
+    InputVec2 res;
+
+    //generate point cloud and fixpoint
+    if(seed != -1) srand(seed);
+    int r = std::rand();
+    double scale = 1;
+
+    switch (hint) {
+        case FPL_CONVEXHULL:
+            res.fixPoint = Kernel::Point_2(sin(r) * x_dim, cos(r) * y_dim);
+            scale = 0.7;
+            break;
+        case FPL_RANDOM:
+            res.fixPoint = Kernel::Point_2((float) (rand() % (x_dim * 2)) - x_dim, (float) (rand() % (y_dim * 2)) - y_dim);
+            break;
+        case FPL_USUALLY_INSIDE:
+            res.fixPoint = Kernel::Point_2(sin(r) * x_dim / 4, cos(r) * y_dim / 4);
+            break;
+        case FPL_CENTER:
+            res.fixPoint = Kernel::Point_2(0, 0);
+            break;
+    }
+
+    for (int i = 0; i < sample_size; i++) {
+        r = rand();
+        res.pointCloud.emplace_back(sin(r) * (rand() % x_dim) * scale, cos(r) * (rand() % y_dim) * scale);
+    }
+    return res;
+}
+
 InputVec3
 generateInputVec3(int sample_size, int seed, fixPointLocation hint, size_t x_dim, size_t y_dim, size_t z_dim) {
     InputVec3 res;
@@ -66,6 +98,22 @@ generateInputVec3(int sample_size, int seed, fixPointLocation hint, size_t x_dim
     return res;
 }
 
+InputVec2 readInputVec2(std::string path) {
+    InputVec2 res;
+
+    std::vector<Kernel::Point_3> points;
+    std::vector<std::vector<std::size_t> > polygons;
+
+    CGAL::IO::read_polygon_soup(path, points, polygons);
+
+    for(auto &p:points){
+        res.pointCloud.emplace_back(p.x(), p.y());
+    }
+    res.fixPoint = {0,0};
+
+    return res;
+}
+
 InputVec3 readInputVec3(std::string path) {
     InputVec3 res;
 
@@ -76,6 +124,30 @@ InputVec3 readInputVec3(std::string path) {
     res.fixPointSet = {{0,0,0},{0,0,0}};
 
     return res;
+}
+
+void randomizeFixpointVec2(InputVec2 &inputs, fixPointLocation hint, int seed) {
+    Min_circle boundingSphere(inputs.pointCloud.begin(), inputs.pointCloud.end());
+    Kernel::Point_2 center = {boundingSphere.center_cartesian_begin()[0],boundingSphere.center_cartesian_begin()[1]};
+
+    if(seed != -1) srand(seed);
+    double r = boundingSphere.radius();
+    auto fixRand = rand();
+    switch (hint) {
+        case FPL_CONVEXHULL:
+            inputs.fixPoint = Kernel::Point_2(r*sin(fixRand)+center.x(), r*cos(fixRand)+center.y());
+            break;
+        case FPL_RANDOM:
+            inputs.fixPoint = Kernel::Point_2(r*sin(rand())+center.x(), r*cos(rand())+center.y());
+            break;
+        case FPL_USUALLY_INSIDE:
+            r /= 4;
+            inputs.fixPoint = Kernel::Point_2(r*sin(fixRand)+center.x(), r*cos(fixRand)+center.y());
+            break;
+        case FPL_CENTER:
+            inputs.fixPoint = Kernel::Point_2(0, 0);
+            break;
+    }
 }
 
 void randomizeFixpointVec3(InputVec3 &inputs, fixPointLocation hint, int seed) {

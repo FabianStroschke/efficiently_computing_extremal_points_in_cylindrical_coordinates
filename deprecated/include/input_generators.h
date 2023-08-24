@@ -34,11 +34,17 @@ struct InputVec3 {
     std::pair<Kernel::Point_3, Kernel::Point_3> fixPointSet;
 };
 
+
+InputVec2 generateInputVec2(int sample_size, int seed = -1, fixPointLocation hint = FPL_RANDOM,
+                  size_t x_dim = 100, size_t y_dim = 100);
+
 InputVec3 generateInputVec3(int sample_size, int seed = -1, fixPointLocation hint = FPL_RANDOM,
                             size_t x_dim = 100, size_t y_dim = 100, size_t z_dim = 100);
 
+InputVec2 readInputVec2(std::string path);
 InputVec3 readInputVec3(std::string path);
 
+void randomizeFixpointVec2(InputVec2 &inputs, fixPointLocation hint = FPL_RANDOM, int seed = -1);
 void randomizeFixpointVec3(InputVec3 &inputs, fixPointLocation hint = FPL_RANDOM, int seed = -1);
 
 #endif //EXAMPLE_INPUT_GENERATORS_H
