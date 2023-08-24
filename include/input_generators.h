@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <ctime>
-#include "../external/glm/glm.hpp"
 #include "CGALSetup.h"
 #include <CGAL/IO/polygon_soup_io.h>
 #include <CGAL/Min_sphere_of_spheres_d.h>
