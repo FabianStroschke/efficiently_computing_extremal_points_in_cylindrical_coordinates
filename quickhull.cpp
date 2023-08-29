@@ -16,7 +16,7 @@ std::vector<Kernel::Point_3>
 quickhullScan(std::vector<Kernel::Point_3> &pointCloud, std::pair<Kernel::Point_3,Kernel::Point_3> &fixPointSet);
 
 int main() {
-    auto input = readInputVec3("../inputs/suzanne.obj");//generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);//readInputVec3("../inputs/suzanne.obj");
     randomizeFixpointVec3(input, FPL_RANDOM, seed);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();

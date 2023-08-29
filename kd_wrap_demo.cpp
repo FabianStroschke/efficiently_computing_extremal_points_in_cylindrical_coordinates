@@ -10,7 +10,7 @@
 #include "matplot_helper.h"
 
 int main() {
-    auto input = generateInputVec3(10,790, FPL_CONVEXHULL);
+    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
