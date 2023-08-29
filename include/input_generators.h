@@ -18,7 +18,7 @@ typedef  CGAL::Min_sphere_of_spheres_d<CGAL::Min_sphere_of_points_d_traits_2<Ker
 typedef  CGAL::Min_sphere_of_spheres_d<CGAL::Min_sphere_of_points_d_traits_3<Kernel,double>>            Min_sphere;
 
 std::vector<Kernel::Point_3> generateInputVec3(int sample_size, int seed = -1,
-                            size_t x_dim = 100, size_t y_dim = 100, size_t z_dim = 100);
+                            double x_dim = 100, double y_dim = 100, double z_dim = 100);
 
 std::vector<Kernel::Point_3> readInputVec3(std::string path);
 
