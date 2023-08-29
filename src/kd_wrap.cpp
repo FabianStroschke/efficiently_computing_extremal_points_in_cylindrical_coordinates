@@ -10,29 +10,14 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     if(pointCloud.empty()) return;
 
     std::vector<Kernel::Point_3> res;
-    /** Building the Octree **/
-
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-    Kd_tree kd_tree(pointCloud.begin(),pointCloud.end(),Kd_tree::Splitter(5));
+    /** Building the KDtree **/
+    Kd_tree kd_tree(pointCloud.begin(),pointCloud.end(),Kd_tree::Splitter(15));
     kd_tree.build();
-
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
 
     /** Solving the Problem here **/
     std::vector<CGAL::SM_Halfedge_index> borderEdges;
 
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
-              << std::endl;
-    
+
     Kernel::Point_3 origin(0,0,0);
     for(auto &p: kd_tree){
         origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
@@ -100,4 +85,5 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             }
         }
     }
+    std::cout << m.vertices().size();
 }
