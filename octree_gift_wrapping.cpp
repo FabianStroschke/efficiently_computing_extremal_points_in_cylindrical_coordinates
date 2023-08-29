@@ -13,12 +13,12 @@
 namespace plt = matplotlibcpp;
 
 int main() {
-    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec3(sample_size, seed);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     Mesh res;
-    octreeWrap(input.pointCloud, res);
+    octreeWrap(input, res);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -41,10 +41,10 @@ int main() {
         matplotArray convexHull;
         matplotArray start;
 
-        //input.pointCloud.emplace_back(input.fixPointSet.first);
-        //input.pointCloud.emplace_back(input.fixPointSet.second);
+        //input.emplace_back(input.fixPointSet.first);
+        //input.emplace_back(input.fixPointSet.second);
 
-        scatterPoints.addList(input.pointCloud);
+        scatterPoints.addList(input);
         for (auto &p: res.points()) {
             convexHull.addPoint(p);
         }

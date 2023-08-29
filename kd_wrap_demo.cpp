@@ -10,12 +10,12 @@
 #include "matplot_helper.h"
 
 int main() {
-    auto input = generateInputVec3(sample_size, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec3(sample_size, seed);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     Mesh res;
-    KDWrap(input.pointCloud, res);
+    KDWrap(input, res);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -40,12 +40,12 @@ int main() {
         matplotArray problemPoints;
         matplotArray problemEdges;
 
-        //input.pointCloud.emplace_back(input.fixPointSet.first);
-        //input.pointCloud.emplace_back(input.fixPointSet.second);
+        //input.emplace_back(input.fixPointSet.first);
+        //input.emplace_back(input.fixPointSet.second);
 
-        scatterPoints.addList(input.pointCloud);
+        scatterPoints.addList(input);
         CGAL::Polyhedron_3<Kernel> poly;
-        CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
+        CGAL::convex_hull_3(input.begin(), input.end(), poly);
 
         for(auto &p: poly.points()){
             convexHull.addPoint(p);
@@ -91,7 +91,7 @@ int main() {
                                                                         {"color",     "c"}}, 1);
         }*/
 
-        Kd_tree kd_tree(input.pointCloud.begin(),input.pointCloud.end(),Kd_tree::Splitter(1));
+        Kd_tree kd_tree(input.begin(),input.end(),Kd_tree::Splitter(1));
         kd_tree.build();
         matplotKDtree treeBoxes(kd_tree);
         treeBoxes.show();
