@@ -85,5 +85,4 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             }
         }
     }
-    std::cout << m.vertices().size();
 }

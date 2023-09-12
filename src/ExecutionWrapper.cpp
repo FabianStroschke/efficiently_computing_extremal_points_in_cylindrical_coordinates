@@ -143,13 +143,13 @@ int main(int argc, char *argv[]) {
     demo.prepareData();
     switch (demo.AType) {
         case Quickhull:
-            std::cout << demo.executeQuickhull().count()<< std::endl;
+            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeQuickhull()).count()<< "ms" << std::endl;
             break;
         case KdMarch:
-            std::cout << demo.executeKdMarch().count()<< std::endl;
+            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeKdMarch()).count()<< "ms"<< std::endl;
             break;
         case OctreeMarch:
-            std::cout << demo.executeOctreeMarch().count()<< std::endl;
+            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeOctreeMarch()).count()<< "ms"<< std::endl;
             break;
         default:
             exit(-1);
