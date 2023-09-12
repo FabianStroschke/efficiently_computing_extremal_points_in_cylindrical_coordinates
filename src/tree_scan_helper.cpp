@@ -42,15 +42,13 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
     switch (side) {
         case BS_LEFT: //"smallest" angle
             index = bestAngles.first - angle;
-            if (*bestAngles.first > minAngle and not(*bestAngles.first <= 0 and *bestAngles.second >= 0)){
+            if (*bestAngles.first > minAngle  and *bestAngles.second < minAngle+M_PI){
                 index = -1;
             }
             break;
         case BS_RIGHT: //"biggest" angle
-
-
             index = bestAngles.second - angle;
-            if (*bestAngles.second < minAngle and not(*bestAngles.first <= 0 and *bestAngles.second >= 0)){
+            if (*bestAngles.second < minAngle and *bestAngles.first > minAngle-M_PI){
                 index = -1;
             }
             break;
