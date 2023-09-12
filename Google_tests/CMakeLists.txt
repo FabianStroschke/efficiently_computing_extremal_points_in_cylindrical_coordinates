@@ -8,3 +8,9 @@ add_executable(Google_Tests_run tree_helper_test.cpp octree_wrap_test.cpp  kd_wr
 target_link_libraries(Google_Tests_run CGAL::CGAL CGAL::CGAL_Core)
 
 target_link_libraries(Google_Tests_run gtest gtest_main)
+
+target_link_libraries(Google_Tests_run
+        Python::Python
+        Python::Module
+        Python::NumPy
+        )

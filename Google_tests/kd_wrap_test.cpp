@@ -14,15 +14,15 @@ typedef CGAL::Polyhedron_3<Kernel> Polyhedron_3;
 void testSameConvexHullRandomKD(long seed, long nPoints){
 
     //generate input
-    auto input = generateInputVec3(nPoints, seed, FPL_CONVEXHULL);
+    auto input = generateInputVec3(nPoints, seed);
 
     //build convex hull
     Polyhedron_3 poly;
-    CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
+    CGAL::convex_hull_3(input.begin(), input.end(), poly);
 
     //build convex mesh
     Mesh mesh;
-    KDWrap(input.pointCloud, mesh);
+    KDWrap(input, mesh);
 
     for(auto &p: poly.points()){
         EXPECT_NE(std::find(mesh.points().begin(), mesh.points().end(),p),mesh.points().end());
@@ -35,11 +35,11 @@ void testSameConvexHullInputKD(std::string path){
 
     //build convex hull
     Polyhedron_3 poly;
-    CGAL::convex_hull_3(input.pointCloud.begin(), input.pointCloud.end(), poly);
+    CGAL::convex_hull_3(input.begin(), input.end(), poly);
 
     //build convex mesh
     Mesh mesh;
-    KDWrap(input.pointCloud, mesh);
+    KDWrap(input, mesh);
 
     for(auto &p: poly.points()){
         EXPECT_NE(std::find(mesh.points().begin(), mesh.points().end(),p),mesh.points().end())<<"Failed with object: " << path;
