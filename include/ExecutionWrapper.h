@@ -18,7 +18,6 @@
 #define EXAMPLE_EXECUTIONWRAPPER_H
 
 enum ALGORITHM{NoAlgorithm,Quickhull, KdMarch, OctreeMarch};
-enum SHAPE{NoShape,BoxFull, BoxSurface, SphereFull, SphereSurface};
 
 class ExecutionWrapper{
 public:

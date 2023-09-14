@@ -17,8 +17,11 @@
 typedef  CGAL::Min_sphere_of_spheres_d<CGAL::Min_sphere_of_points_d_traits_2<Kernel,double>>            Min_circle;
 typedef  CGAL::Min_sphere_of_spheres_d<CGAL::Min_sphere_of_points_d_traits_3<Kernel,double>>            Min_sphere;
 
-std::vector<Kernel::Point_3> generateInputVec3(int sample_size, int seed = -1,
-                            double x_dim = 100, double y_dim = 100, double z_dim = 100);
+enum SHAPE{NoShape,BoxFull, BoxSurface, SphereFull, SphereSurface};
+
+std::vector<Kernel::Point_3>
+generateInputVec3(int sample_size, int seed = -1, double x_dim = 100, double y_dim = 100, double z_dim = 100,
+                  SHAPE shape = SphereFull);
 
 std::vector<Kernel::Point_3> readInputVec3(std::string path);
 

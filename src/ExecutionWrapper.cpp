@@ -95,7 +95,7 @@ void ExecutionWrapper::readInput(int argc, char* argv[]){
 
 void ExecutionWrapper::prepareData() {
     if(seed){
-        data = generateInputVec3(this->size, this->seed, dim[0],dim[1],dim[2]);
+        data = generateInputVec3(this->size, this->seed, dim[0], dim[1], dim[2], shape);
     }else{
         data = readInputVec3(path);
     }
