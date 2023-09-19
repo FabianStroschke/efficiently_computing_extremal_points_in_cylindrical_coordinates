@@ -254,71 +254,60 @@ TEST(FindBoundaryKD, C10M){
 }
 
 TEST(CompareSearches, N100000){
+    auto foo = [](const std::vector<Kernel::Point_3> &input){
+        Kd_tree kd_tree(input.begin(), input.end(), Kd_tree::Splitter(1));
+        kd_tree.build();
+
+        Kernel::Point_3 origin(0, 0, 0);
+        for (auto &p: kd_tree) {
+            origin = {origin.x() + p.x() / kd_tree.size(), origin.y() + p.y() / kd_tree.size(),
+                      origin.z() + p.z() / kd_tree.size()};
+        }
+
+
+        const CGAL::Kd_tree_rectangle<double, Traits::Dimension> &bbox(kd_tree.bounding_box());
+        std::pair<Kernel::Point_3, Kernel::Point_3> set = {
+                {bbox.max_coord(0), bbox.max_coord(1), bbox.max_coord(2)},
+                {bbox.max_coord(0), bbox.max_coord(1), bbox.min_coord(2)}};
+
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+        auto a = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+        std::cout << input.size() << ";"<< std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << ";";
+
+
+        Kernel::Plane_3 u(set.first, set.second, origin);
+
+        Kernel::Vector_3 normal(set.first, set.second); //vector along rotation axis
+        normal /= sqrt(normal.squared_length());
+        auto angle = 0;
+        auto res = 0;
+
+        begin = std::chrono::steady_clock::now();
+
+        for (int i = 0; i < input.size(); i++) {
+            Kernel::Plane_3 v(set.first, set.second, input[i]);
+            auto a2 = atan2(
+                    (CGAL::cross_product(u.orthogonal_vector(), v.orthogonal_vector())) * normal,
+                    u.orthogonal_vector() * v.orthogonal_vector());
+            if (angle > a2) {
+                angle = a2;
+                res = i;
+            }
+        }
+
+        end = std::chrono::steady_clock::now();
+
+        std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << std::endl;
+    };
 
     //generate input
-    auto input = generateInputVec3(10000000, 12345);
-
-    Kd_tree kd_tree(input.begin(),input.end(), Kd_tree::Splitter(1));
-    kd_tree.build();
-
-    Kernel::Point_3 origin(0,0,0);
-    for(auto &p: kd_tree){
-        origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
+    for (int i = 100; i < 1000000; i=i*1.5) {
+        foo(generateInputVec3(i, 12345));
     }
 
-
-    const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& bbox(kd_tree.bounding_box());
-    std::pair<Kernel::Point_3,Kernel::Point_3> set = {
-            {bbox.max_coord(0),bbox.max_coord(1),bbox.max_coord(2)}
-            ,{bbox.max_coord(0),bbox.max_coord(1),bbox.min_coord(2)}};
-
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-    auto a = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
-
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
-              << std::endl;
-
-
-    Kernel ::Plane_3 u(set.first, set.second,origin);
-
-    Kernel::Vector_3 normal(set.first,set.second); //vector along rotation axis
-    normal /= sqrt(normal.squared_length());
-    auto angle = 0;
-    auto res = 0;
-
-    begin = std::chrono::steady_clock::now();
-
-    for(int i = 0; i< input.size(); i++){
-        Kernel ::Plane_3 v(set.first, set.second,input[i]);
-        auto a2 = atan2(
-                (CGAL::cross_product(u.orthogonal_vector(),v.orthogonal_vector()))*normal,
-                u.orthogonal_vector()*v.orthogonal_vector());
-        if(angle > a2){
-            angle = a2;
-            res = i;
-        }
-    }
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[mircos]"
-              << std::endl;
-    std::cout << "Time difference = "
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]"
-              << std::endl;
 }
 
