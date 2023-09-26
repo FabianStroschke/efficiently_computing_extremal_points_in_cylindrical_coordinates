@@ -37,8 +37,6 @@ int main() {
         matplotArray scatterPoints;
         matplotArray convexHull;
         matplotArray start;
-        matplotArray problemPoints;
-        matplotArray problemEdges;
 
         //input.emplace_back(input.fixPointSet.first);
         //input.emplace_back(input.fixPointSet.second);
@@ -101,28 +99,6 @@ int main() {
         for(auto &p: kd_tree){
             origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
         }
-
-
-        problemEdges.addPoint({-36.258379764854524, -4.1599316927573398, 3.0090613243501325});
-        problemEdges.addPoint({-0.53957021850918252, -3.8692498521924357, 65.679343979892749});
-        problemEdges.addPoint({-12.812, -7.90927, 32.1854});
-
-        problemPoints.addPoint({10.7977, -34.6158, -10.2332});
-        problemPoints.addPoint(origin);
-
-
-        plt::plot3(problemEdges.x, problemEdges.y, problemEdges.z, {{"linewidth",  "0.0"},
-                                                                    {"marker",     "o"},
-                                                                    {"markersize", "5.0"},
-                                                                    {"color",      "b"}}, 1);
-
-
-        plt::plot3(problemPoints.x, problemPoints.y, problemPoints.z, {{"linewidth",  "0.0"},
-                                                                    {"marker",     "o"},
-                                                                    {"markersize", "5.0"},
-                                                                    {"color",      "r"}}, 1);
-
-
 
 
         plt::show();
