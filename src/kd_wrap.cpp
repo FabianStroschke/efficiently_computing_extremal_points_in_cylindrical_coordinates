@@ -27,8 +27,8 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     //CGAL::Kd_tree_rectangle<Traits::FT,CGAL::internal::Get_dimension_tag<Traits>::Dimension>
     const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& bbox(kd_tree.bounding_box());
     std::pair<Kernel::Point_3,Kernel::Point_3> set = {
-             {bbox.max_coord(0),bbox.max_coord(1),bbox.max_coord(2)}
-            ,{bbox.max_coord(0),bbox.max_coord(1),bbox.min_coord(2)}
+             {bbox.max_coord(0),bbox.max_coord(1)+1,bbox.max_coord(2)}
+            ,{bbox.max_coord(0),bbox.max_coord(1)+1,bbox.min_coord(2)}
     }; //TODO replace with halfedge
     set.first = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
     set.second = *findBoundaryPoint(kd_tree, set, BS_RIGHT, origin);
@@ -63,6 +63,8 @@ KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                                m.source(h), m.target(h));
 
                 if(f == Mesh::null_face() ){ //TODO if this case is reached, then the algorithm failed. Maybe add an exception
+                    std::cout << "err\n";
+                    exit(-1);
                     std::cout << s <<"\n";
                     std::cout << t <<"\n";
                     std::cout << *p <<"\n";

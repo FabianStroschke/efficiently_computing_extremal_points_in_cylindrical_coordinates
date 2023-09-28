@@ -21,6 +21,18 @@ double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::
             (CGAL::cross_product(u.orthogonal_vector(),v.orthogonal_vector()))*normalisedNormal,
             u.orthogonal_vector()*v.orthogonal_vector());
 }
+
+double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Vector_3 v_normal, Kernel::Vector_3 normalisedNormal){
+    return DiamondAngle(
+            (CGAL::cross_product(u.orthogonal_vector(),v_normal))*normalisedNormal,
+            u.orthogonal_vector()*v_normal);
+}
+double orientedAngleBetweenPlanes2(Kernel::Plane_3 u, Kernel::Vector_3 v_normal, Kernel::Vector_3 normalisedNormal){
+    return atan2(
+            (CGAL::cross_product(u.orthogonal_vector(),v_normal))*normalisedNormal,
+            u.orthogonal_vector()*v_normal);
+}
+
 int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                      boundarySide side, double minAngle) {
 
@@ -41,8 +53,11 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
 
     //oriented angle see: https://stackoverflow.com/questions/5188561/signed-angle-between-two-3d-vectors-with-same-origin-within-the-same-plane
     double angle[8];
+    double angle2[8];
+    auto v_n=fixToOrigin.orthogonal_vector();
     for(int i = 0; i < 8; i++) {
-        angle[i] = orientedAngleBetweenPlanes(fixToCorner[i],fixToOrigin,normal);
+        angle[i] = orientedAngleBetweenPlanes(fixToCorner[i],v_n,normal);
+        angle2[i] = orientedAngleBetweenPlanes2(fixToCorner[i],v_n,normal);
     }
 
     int index = -1;
@@ -65,6 +80,27 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
             }
             break;
     }
+    int index2 = -1;
+    auto bestAngles2 = std::minmax_element(angle2, angle2+8);
+    auto sum2 = abs(*bestAngles2.first) + abs(*bestAngles2.second);
+    auto difSide2 = *bestAngles2.second >= 0 and *bestAngles2.first <= 0;
+    switch (side) {
+        case BS_LEFT: //"smallest" angle
+            if(*bestAngles.first < minAngle){
+                index2 = bestAngles.first - angle2;
+            }else if(difSide2 and sum2 > M_PI){
+                index2 = bestAngles.second - angle2;
+            }
+            break;
+        case BS_RIGHT: //"biggest" angle
+            if(*bestAngles.second > minAngle){
+                index2 = bestAngles2.second - angle2;
+            }else if(difSide2 and sum2 > M_PI){
+                index2 = bestAngles2.first - angle2;
+            }
+            break;
+    }
+
     return index;
 }
 
@@ -194,15 +230,11 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
             auto node = static_cast<Kd_tree::Internal_node_const_handle>(currentPair.first);
             CGAL::Bbox_3 bbox(currentPair.second.min_coord(0),currentPair.second.min_coord(1),currentPair.second.min_coord(2),
                               currentPair.second.max_coord(0),currentPair.second.max_coord(1),currentPair.second.max_coord(2));
-            int idx = 0;
-            if(not CGAL::intersection(line, bbox)){
-                idx = findBoundaryCell(bbox, origin, fixPointSet, side, angle);
-            }
+            int idx = findBoundaryCell(bbox, origin, fixPointSet, side, angle);
             if(idx >=0) {
                 CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_upper(currentPair.second);
                 CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_lower(currentPair.second);
                 node->split_bbox(bbox_lower, bbox_upper);
-                auto test = node->cutting_value();
                 //if idx corner is the max value along the cutting dimension, push lower() than upper()
 
                 /** idx is a bit code for a corner, see here: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
