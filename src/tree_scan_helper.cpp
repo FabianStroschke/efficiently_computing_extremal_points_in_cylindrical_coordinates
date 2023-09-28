@@ -36,20 +36,23 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
         angle[i] = orientedAngleBetweenPlanes(fixToCorner[i],fixToOrigin,normal);
     }
 
-    int index = 0;
+    int index = -1;
     auto bestAngles = std::minmax_element(angle, angle+8);
-
+    auto sum = abs(*bestAngles.first) + abs(*bestAngles.second);
+    bool difSide = *bestAngles.second >= 0 and *bestAngles.first <= 0;
     switch (side) {
         case BS_LEFT: //"smallest" angle
-            index = bestAngles.first - angle;
-            if (*bestAngles.first > minAngle  and *bestAngles.second < minAngle+M_PI){
-                index = -1;
+            if(*bestAngles.first < minAngle){
+                index = bestAngles.first - angle;
+            }else if(difSide and sum > M_PI){
+                index = bestAngles.second - angle;
             }
             break;
         case BS_RIGHT: //"biggest" angle
-            index = bestAngles.second - angle;
-            if (*bestAngles.second < minAngle and *bestAngles.first > minAngle-M_PI){
-                index = -1;
+            if(*bestAngles.second > minAngle){
+                index = bestAngles.second - angle;
+            }else if(difSide and sum > M_PI){
+                index = bestAngles.first - angle;
             }
             break;
     }
@@ -109,10 +112,8 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
             }
         } else {
             //for index see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
-            int idx = 0;
-            if(not CGAL::intersection(line, tree.bbox(currentNode))){
-                idx = findBoundaryCell(tree.bbox(currentNode), origin, fixPointSet, side, angle);
-            }
+            int idx = findBoundaryCell(tree.bbox(currentNode), origin, fixPointSet, side, angle);
+
             if(idx >=0) {
                 stack.push(currentNode[idx ^ 7]); //flip x,y,z    //opposite corner of idx
                 stack.push(currentNode[idx ^ 6]); //flip y,z      //adjacent to opposite corner
@@ -192,6 +193,7 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
                 CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_upper(currentPair.second);
                 CGAL::Kd_tree_rectangle<double, Traits::Dimension> bbox_lower(currentPair.second);
                 node->split_bbox(bbox_lower, bbox_upper);
+                auto test = node->cutting_value();
                 //if idx corner is the max value along the cutting dimension, push lower() than upper()
 
                 /** idx is a bit code for a corner, see here: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
