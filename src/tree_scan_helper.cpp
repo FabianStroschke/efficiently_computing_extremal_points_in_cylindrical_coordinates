@@ -14,7 +14,7 @@ double DiamondAngle(double y, double x)
     if (y >= 0)
         return (x >= 0 ? y/(x+y) : 1-x/(-x+y));
     else
-        return -(4-(x < 0 ? 2-y/(-x-y) : 3+x/(x-y)));
+        return (x < 0 ? -2-y/(-x-y) : -1+x/(x-y));
 }
 double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::Vector_3 normalisedNormal){
     return DiamondAngle(
