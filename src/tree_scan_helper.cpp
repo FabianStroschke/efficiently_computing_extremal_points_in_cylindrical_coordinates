@@ -7,8 +7,17 @@
 double cosTheta3(Kernel::Vector_3 u, Kernel::Vector_3 v) {
     return u * v / (sqrt(u.squared_length()) * sqrt(v.squared_length()));
 }
+
+double DiamondAngle(double y, double x)
+{
+    //added 2- so its similar to atan2
+    if (y >= 0)
+        return (x >= 0 ? y/(x+y) : 1-x/(-x+y));
+    else
+        return -(4-(x < 0 ? 2-y/(-x-y) : 3+x/(x-y)));
+}
 double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::Vector_3 normalisedNormal){
-    return atan2(
+    return DiamondAngle(
             (CGAL::cross_product(u.orthogonal_vector(),v.orthogonal_vector()))*normalisedNormal,
             u.orthogonal_vector()*v.orthogonal_vector());
 }
@@ -44,14 +53,14 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
         case BS_LEFT: //"smallest" angle
             if(*bestAngles.first < minAngle){
                 index = bestAngles.first - angle;
-            }else if(difSide and sum > M_PI){
+            }else if(difSide and sum > 2){
                 index = bestAngles.second - angle;
             }
             break;
         case BS_RIGHT: //"biggest" angle
             if(*bestAngles.second > minAngle){
                 index = bestAngles.second - angle;
-            }else if(difSide and sum > M_PI){
+            }else if(difSide and sum > 2){
                 index = bestAngles.first - angle;
             }
             break;
@@ -73,10 +82,10 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
     double angle = 0;
     switch (side) {
         case BS_LEFT:
-            angle = M_PI;
+            angle = 2;
             break;
         case BS_RIGHT:
-            angle = -M_PI;
+            angle = -2;
             break;
     }
     std::vector<int> quadrantOrder = {0, 1, 3, 2};
@@ -144,10 +153,10 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
     double angle = 0;
     switch (side) {
         case BS_LEFT:
-            angle = M_PI;
+            angle = 2;
             break;
         case BS_RIGHT:
-            angle = -M_PI;
+            angle = -2;
             break;
     }
     std::vector<int> quadrantOrder = {0, 1, 3, 2};
