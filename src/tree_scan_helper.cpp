@@ -16,21 +16,15 @@ double DiamondAngle(double y, double x)
     else
         return (x < 0 ? -2-y/(-x-y) : -1+x/(x-y));
 }
-double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::Vector_3 normalisedNormal){
-    return DiamondAngle(
-            (CGAL::cross_product(u.orthogonal_vector(),v.orthogonal_vector()))*normalisedNormal,
-            u.orthogonal_vector()*v.orthogonal_vector());
-}
 
 double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Vector_3 v_normal, Kernel::Vector_3 normalisedNormal){
-    return DiamondAngle(
+    return (u.orthogonal_vector().squared_length() == 0 or v_normal.squared_length() == 0) ? 0 : DiamondAngle(
             (CGAL::cross_product(u.orthogonal_vector(),v_normal))*normalisedNormal,
             u.orthogonal_vector()*v_normal);
 }
-double orientedAngleBetweenPlanes2(Kernel::Plane_3 u, Kernel::Vector_3 v_normal, Kernel::Vector_3 normalisedNormal){
-    return atan2(
-            (CGAL::cross_product(u.orthogonal_vector(),v_normal))*normalisedNormal,
-            u.orthogonal_vector()*v_normal);
+
+double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::Vector_3 normalisedNormal){
+    return orientedAngleBetweenPlanes(u,v.orthogonal_vector(),normalisedNormal);
 }
 
 int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
@@ -53,11 +47,9 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
 
     //oriented angle see: https://stackoverflow.com/questions/5188561/signed-angle-between-two-3d-vectors-with-same-origin-within-the-same-plane
     double angle[8];
-    double angle2[8];
     auto v_n=fixToOrigin.orthogonal_vector();
     for(int i = 0; i < 8; i++) {
         angle[i] = orientedAngleBetweenPlanes(fixToCorner[i],v_n,normal);
-        angle2[i] = orientedAngleBetweenPlanes2(fixToCorner[i],v_n,normal);
     }
 
     int index = -1;
@@ -80,27 +72,6 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
             }
             break;
     }
-    int index2 = -1;
-    auto bestAngles2 = std::minmax_element(angle2, angle2+8);
-    auto sum2 = abs(*bestAngles2.first) + abs(*bestAngles2.second);
-    auto difSide2 = *bestAngles2.second >= 0 and *bestAngles2.first <= 0;
-    switch (side) {
-        case BS_LEFT: //"smallest" angle
-            if(*bestAngles.first < minAngle){
-                index2 = bestAngles.first - angle2;
-            }else if(difSide2 and sum2 > M_PI){
-                index2 = bestAngles.second - angle2;
-            }
-            break;
-        case BS_RIGHT: //"biggest" angle
-            if(*bestAngles.second > minAngle){
-                index2 = bestAngles2.second - angle2;
-            }else if(difSide2 and sum2 > M_PI){
-                index2 = bestAngles2.first - angle2;
-            }
-            break;
-    }
-
     return index;
 }
 
@@ -179,6 +150,7 @@ Kernel::Point_3 const *
 findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   boundarySide side, Kernel::Point_3 origin) {
     Kernel::Point_3 const *res = nullptr;
+    Kernel::Point_3 const *resTan = nullptr;
 
     const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& box(tree.bounding_box());
 
@@ -195,7 +167,6 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
             angle = -2;
             break;
     }
-    std::vector<int> quadrantOrder = {0, 1, 3, 2};
 
     typedef std::pair<Kd_tree::Node_const_handle,CGAL::Kd_tree_rectangle<double, Traits::Dimension>> node_bbox_pair;
     std::stack<node_bbox_pair> stack;
