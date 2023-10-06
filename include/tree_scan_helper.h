@@ -14,7 +14,7 @@
 //typedefs
 typedef Kernel::Point_3 Point_3;
 typedef CGAL::Search_traits_3<Kernel >  Traits;
-typedef CGAL::Kd_tree<Traits> Kd_tree;
+typedef CGAL::Kd_tree<Traits,CGAL::Median_of_max_spread<Traits>> Kd_tree;
 typedef CGAL::Octree<Kernel, std::vector<Kernel::Point_3>> Octree;
 
 
