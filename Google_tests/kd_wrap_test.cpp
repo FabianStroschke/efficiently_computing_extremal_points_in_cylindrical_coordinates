@@ -24,8 +24,34 @@ void testSameConvexHullRandomKD(long seed, long nPoints){
     Mesh mesh;
     KDWrap(input, mesh);
 
+    //check if both hulls have the same points
     for(auto &p: poly.points()){
         EXPECT_NE(std::find(mesh.points().begin(), mesh.points().end(),p),mesh.points().end());
+    }
+
+    //check if both mesh is convex
+    EXPECT_EQ(CGAL::is_strongly_convex_3(poly),CGAL::is_strongly_convex_3(mesh));
+    for(auto f: mesh.faces()){
+        auto faceVertices = mesh.vertices_around_face(mesh.halfedge(f)).begin();
+        auto v0 = mesh.point(*faceVertices++);
+        auto v1 = mesh.point(*faceVertices++);
+        auto v2 = mesh.point(*faceVertices);
+        auto cross = CGAL::cross_product(Kernel::Vector_3(v1,v0),Kernel::Vector_3(v2,v0));
+        long positive = 0;
+        long neutral = 0;
+        long negative = 0;
+        for (auto p : mesh.points()) {
+            if(p == v0 or p == v1 or p == v2)continue;
+            double dot = Kernel::Vector_3(p,v0)*cross;
+            if(dot>0){
+                positive++;
+            }else if(dot<0){
+                negative++;
+            }else{
+                neutral++;
+            }
+        }
+            EXPECT_TRUE(not(positive > 0 and negative > 0));
     }
 }
 
