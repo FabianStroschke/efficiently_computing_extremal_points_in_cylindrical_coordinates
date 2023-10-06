@@ -146,11 +146,10 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
 
 }
 
-Kernel::Point_3 const *
+std::vector<Kernel::Point_3 const*>
 findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   boundarySide side, Kernel::Point_3 origin) {
-    Kernel::Point_3 const *res = nullptr;
-    Kernel::Point_3 const *resTan = nullptr;
+    std::vector<Kernel::Point_3 const *> resStack;
 
     const CGAL::Kd_tree_rectangle<double, Traits::Dimension>& box(tree.bounding_box());
 
@@ -184,15 +183,21 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
                 double angle2 = orientedAngleBetweenPlanes({fixPointSet.first,fixPointSet.second, p},fixToOrigin,normal);
                 switch (side) {
                     case BS_LEFT: //find negative angle with the biggest absolute value
-                        if (angle > angle2) {
+                        if (angle >= angle2) {
                             angle = angle2;
-                            res = &p;
+                            if(not resStack.empty() and not CGAL::coplanar(fixPointSet.first,fixPointSet.second,**(resStack.begin()),p)){
+                                resStack.clear();
+                            }
+                            resStack.emplace_back(&p);
                         }
                         break;
                     case BS_RIGHT: //find positive angle with the biggest absolute value
-                        if (angle < angle2) {
+                        if (angle <= angle2) {
                             angle = angle2;
-                            res = &p;
+                            if(not resStack.empty() and not CGAL::coplanar(fixPointSet.first,fixPointSet.second,**(resStack.begin()),p)){
+                                resStack.clear();
+                            }
+                            resStack.emplace_back(&p);
                         }
                         break;
                 }
@@ -226,6 +231,6 @@ findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::
             }
         }
     }
-    return res;
+    return resStack;
 
 }

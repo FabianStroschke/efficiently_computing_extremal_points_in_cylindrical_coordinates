@@ -31,7 +31,7 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
                      boundarySide side, double minAngle);
 
 Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side);
-Kernel::Point_3 const *
+std::vector<Kernel::Point_3 const *>
 findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   boundarySide side, Kernel::Point_3 origin);
 
