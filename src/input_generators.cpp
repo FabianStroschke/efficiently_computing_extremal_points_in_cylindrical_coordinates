@@ -73,16 +73,16 @@ generateInputVec3(int sample_size, int seed, double x_dim, double y_dim, double 
                         break;
                     case 1:
                         if(rand()%2 == 0){
-                            res.emplace_back(x1, -y_dim, x3);
+                            res.emplace_back(x1, -y_dim/2, x3);
                         }else{
-                            res.emplace_back(x1, y_dim, x3);
+                            res.emplace_back(x1, y_dim/2, x3);
                         }
                         break;
                     case 2:
                         if(rand()%2 == 0){
-                            res.emplace_back(x1, x2, -z_dim);
+                            res.emplace_back(x1, x2, -z_dim/2);
                         }else{
-                            res.emplace_back(x1, x2, z_dim);
+                            res.emplace_back(x1, x2, z_dim/2);
                         }
                         break;
                 }
