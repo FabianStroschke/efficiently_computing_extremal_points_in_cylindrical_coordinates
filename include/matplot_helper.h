@@ -10,15 +10,10 @@
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>
 
-#include <CGAL/Kd_tree.h>
-#include <CGAL/Search_traits_3.h>
 
 #include "../external/matplotlibcpp/matplotlibcpp.h"
 
 
-typedef Kernel::Point_3 Point_3;
-typedef CGAL::Search_traits_3<Kernel >  Traits;
-typedef CGAL::Kd_tree<Traits> Kd_tree;
 
 namespace plt = matplotlibcpp;
 
