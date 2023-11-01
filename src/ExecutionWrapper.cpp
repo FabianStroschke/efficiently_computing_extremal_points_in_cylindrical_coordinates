@@ -15,6 +15,9 @@ void ExecutionWrapper::readInput(int argc, char* argv[]){
         }else if(argv[i] == std::string("-KD")){
             if(AType != NoAlgorithm){std::cerr << "Select only one algorithm.\n";exit(-1);}
             AType = KdMarch;
+        }else if(argv[i] == std::string("-GW")){
+            if(AType != NoAlgorithm){std::cerr << "Select only one algorithm.\n";exit(-1);}
+            AType = GiftWrapping;
         }else if(argv[i] == std::string("-seed")){
             if(i+1< argc){
                 i++;
@@ -138,6 +141,18 @@ std::chrono::nanoseconds ExecutionWrapper::executeOctreeMarch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 }
 
+std::chrono::nanoseconds ExecutionWrapper::executeGiftWrapping() {
+    prepareData();
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+    Mesh res;
+    GiftWrap(data, res);
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+}
+
 int main(int argc, char *argv[]) {
     auto demo = ExecutionWrapper(argc,argv);
     demo.prepareData();
@@ -150,6 +165,9 @@ int main(int argc, char *argv[]) {
             break;
         case OctreeMarch:
             std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeOctreeMarch()).count()<< "ms"<< std::endl;
+            break;
+        case GiftWrapping:
+            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeGiftWrapping()).count()<< "ms"<< std::endl;
             break;
         default:
             exit(-1);

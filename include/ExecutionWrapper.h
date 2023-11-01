@@ -8,6 +8,7 @@
 
 #include "kd_wrap.h"
 #include "octree_wrap.h"
+#include "gift_wrapping.h"
 
 
 #include "CGALSetup.h"
@@ -17,7 +18,7 @@
 #ifndef EXAMPLE_EXECUTIONWRAPPER_H
 #define EXAMPLE_EXECUTIONWRAPPER_H
 
-enum ALGORITHM{NoAlgorithm,Quickhull, KdMarch, OctreeMarch};
+enum ALGORITHM{NoAlgorithm,Quickhull, KdMarch, OctreeMarch, GiftWrapping};
 
 class ExecutionWrapper{
 public:
@@ -35,6 +36,7 @@ public:
     std::chrono::nanoseconds executeQuickhull();
     std::chrono::nanoseconds executeKdMarch();
     std::chrono::nanoseconds executeOctreeMarch();
+    std::chrono::nanoseconds executeGiftWrapping();
 
 };
 
