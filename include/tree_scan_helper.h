@@ -30,10 +30,13 @@ double orientedAngleBetweenPlanes(Kernel::Plane_3 u, Kernel::Plane_3 v, Kernel::
 int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                      boundarySide side, double minAngle);
 
-Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side);
+std::vector<Kernel::Point_3 const*>
+        findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+                      boundarySide side, Kernel::Point_3 origin);
+
 std::vector<Kernel::Point_3 const *>
-findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
-                  boundarySide side, Kernel::Point_3 origin);
+        findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+                      boundarySide side, Kernel::Point_3 origin);
 
 
 #endif //EXAMPLE_TREE_SCAN_HELPER_H

@@ -10,6 +10,9 @@
 #include "CGALSetup.h"
 #include <CGAL/Octree.h>
 #include <CGAL/Surface_mesh.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+typedef CGAL::Delaunay_triangulation_2<Kernel>  Triangulation;
+
 
 //typedefs
 typedef Kernel::Point_3 Point_3;

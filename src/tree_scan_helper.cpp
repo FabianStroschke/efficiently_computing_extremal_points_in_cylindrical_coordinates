@@ -95,11 +95,9 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
     return index;
 }
 
-Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet, boundarySide side){
-    Kernel::Point_3 const *res = nullptr;
-
-    auto bbox = tree.bbox(tree.root());
-    Kernel::Point_3 origin((bbox.xmax() + bbox.xmin()) / 2, (bbox.ymax() + bbox.ymin()) / 2, (bbox.zmax() + bbox.zmin()) / 2);
+std::vector<Kernel::Point_3 const*>findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+                  boundarySide side, Kernel::Point_3 origin){
+    std::vector<Kernel::Point_3 const *> resStack;
 
     //TODO: extract from findBoundaryCell (?)
     Kernel::Plane_3 fixToOrigin(fixPointSet.first,fixPointSet.second, origin);
@@ -129,22 +127,28 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
         if (currentNode.is_leaf()) {
             for (auto const &p: currentNode) {
                 if(p == fixPointSet.first or p == fixPointSet.second) continue;
+                //std::cout << p << std::endl;
                 double angle2 = orientedAngleBetweenPlanes({fixPointSet.first,fixPointSet.second, p},fixToOrigin,normal);
                 switch (side) {
                     case BS_LEFT: //find negative angle with the biggest absolute value
-                        if (angle > angle2) {
+                        if(not resStack.empty() and CGAL::coplanar(fixPointSet.first,fixPointSet.second,**(resStack.begin()),p)){
+                            resStack.emplace_back(&p);
+                        }else if(angle > angle2){
                             angle = angle2;
-                            res = &p;
+                            resStack.clear();
+                            resStack.emplace_back(&p);
                         }
                         break;
                     case BS_RIGHT: //find positive angle with the biggest absolute value
-                        if (angle < angle2) {
+                        if(not resStack.empty() and CGAL::coplanar(fixPointSet.first,fixPointSet.second,**(resStack.begin()),p)){
+                            resStack.emplace_back(&p);
+                        }else if(angle < angle2){
                             angle = angle2;
-                            res = &p;
+                            resStack.clear();
+                            resStack.emplace_back(&p);
                         }
                         break;
                 }
-
             }
         } else {
             //for index see: https://doc.cgal.org/latest/Orthtree/classCGAL_1_1Orthtree_1_1Node.html#a706069ea795fdf65b289f597ce1eb8fd
@@ -162,7 +166,7 @@ Kernel::Point_3 const *findBoundaryPoint(const Octree &tree, const std::pair<Ker
             }
         }
     }
-    return res;
+    return resStack;
 
 }
 
