@@ -4,13 +4,42 @@
 
 #include "gift_wrapping.h"
 
-
 std::vector<Kernel::Point_3 const*>
 findBoundaryPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
-                  Kernel::Point_3 origin) {
+                  Kernel::Plane_3 face) {
     std::vector<Kernel::Point_3 const *> resStack;
 
+    Kernel::Vector_3 n = face.orthogonal_vector()/ sqrt(face.orthogonal_vector().squared_length());
+    Kernel::Vector_3 ref = fixPointSet.second-fixPointSet.first;
+    ref /= sqrt(ref.squared_length());
 
+    Kernel::Vector_3 a = CGAL::cross_product(n, ref);
+    a /= sqrt(a.squared_length());
+
+
+    double angle = 1000;
+    double angle2;
+
+
+    for(auto &p:pointCloud){
+        if(p == fixPointSet.first or p== fixPointSet.second)continue;
+
+        Kernel::Vector_3 v = p-fixPointSet.first;
+        v = v-(v*ref)*ref;
+        v /=sqrt(v.squared_length());
+        angle2 = a*v ;
+        if(not resStack.empty() and CGAL::coplanar(fixPointSet.first,fixPointSet.second,**(resStack.begin()),p)){
+            resStack.emplace_back(&p);
+        }else
+            if(angle > angle2){
+            angle = angle2;
+            resStack.clear();
+            resStack.emplace_back(&p);
+        }
+    }
+    return resStack;
+
+/*
     Kernel::Plane_3 fixToOrigin(fixPointSet.first,fixPointSet.second, origin);
     Kernel::Vector_3 normal(fixPointSet.first,fixPointSet.second); //vector along rotation axis
     normal /= sqrt(normal.squared_length());
@@ -32,7 +61,7 @@ findBoundaryPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kern
     }
 
     return resStack;
-
+*/
 }
 
 void
@@ -56,12 +85,16 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
              {1000000, 0, 0}
             ,{1000000, 100, 0}
     }; //TODO replace with halfedge
-    set.first = **findBoundaryPoint(pointCloud, set, origin).begin();
-    set.second = **findBoundaryPoint(pointCloud, set, origin).begin();
 
-    //add edge to mesh
-    CGAL::SM_Halfedge_index initialEdge = m.add_edge( m.add_vertex(set.second), m.add_vertex(set.first));
-    borderEdges.push_back(initialEdge);
+    Kernel::Point_3 p3 = **findBoundaryPoint(pointCloud, set, {set.first, set.second, {1000000,0,100}}).begin();
+
+    set.first = **findBoundaryPoint(pointCloud, {p3, set.second}, {p3, set.second, set.first}).begin();
+    set.second = **findBoundaryPoint(pointCloud, {p3, set.first}, {p3,  set.first, set.second}).begin();
+
+    //add face to mesh
+    for (auto &e: m.halfedges_around_face(m.halfedge(m.add_face(m.add_vertex(set.second), m.add_vertex(set.first),m.add_vertex(p3))))) {
+        if (m.is_border(m.opposite(e))) borderEdges.push_back(m.opposite(e));
+    }
     //std::cout<<"_________________________"<<std::endl;
 
     //iterate over borderedges
@@ -71,8 +104,12 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
         if (m.is_border(h)){
             auto t = m.point(m.target(h));
             auto s = m.point(m.source(h));
+            std::vector<Kernel::Point_3> facePoints;
+            for(auto vd : m.vertices_around_face(m.halfedge(m.face(m.opposite(h))))){
+                facePoints.push_back(m.point(vd));
+            }
 
-            auto res = findBoundaryPoint(pointCloud, {t,s}, origin);
+            auto res = findBoundaryPoint(pointCloud, {t,s}, Kernel::Plane_3(facePoints[0],facePoints[1],facePoints[2]));
 
             if(res.empty()) {//TODO shouldn't happen, throw exception (if it happens s and t arent on the convex hull or the program is broken)
                 continue;
@@ -87,7 +124,7 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                         count++;
                     }
                 }
-                if (count > res.size() + 2) {
+                /*if (count > res.size() + 2) {
                     std::cout<<"_________________________"<<std::endl;
 
                     for (auto p: pointCloud) {
@@ -95,9 +132,9 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(pointCloud, {s, t}, origin);
+                    auto resAlt = findBoundaryPoint(pointCloud, {t,s}, va,s);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
-                }
+                }*/
 
                 //calc base vectors
                 Point_3 p0 = m.point(m.source(h));
