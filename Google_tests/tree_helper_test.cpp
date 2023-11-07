@@ -32,6 +32,12 @@ void testFindBoundary(long seed, long nPoints, int bucketSize){
     //iterate over faces
     for(auto it = poly.facets_begin(); it != poly.facets_end(); it++){
         auto face_iterator = *it->facet_begin();
+
+        Kernel::Point_3 origin(0,0,0);
+        for(auto &p: input){
+            origin = {origin.x()+p.x()/input.size(),origin.y()+p.y()/input.size(),origin.z()+p.z()/input.size()};
+        }
+
         if(face_iterator.face()->is_triangle()){
             tests_total += 3;
             Kernel::Point_3 vertices[3] = {
@@ -40,17 +46,22 @@ void testFindBoundary(long seed, long nPoints, int bucketSize){
                     face_iterator.next()->next()->vertex()->point()
             };
             for (int i = 0; i < 3; ++i) {
-                auto res = findBoundaryPoint(octree, {vertices[i],vertices[(i+1)%3]},BS_LEFT);
-                if(res != nullptr){
-                    EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"}";
-                    if(*res == vertices[(i+2)%3]){
-                        tests_complete++;
-                    }else{
-                        tests_failed++;
+                auto resStack = findBoundaryPoint(octree, {vertices[(i + 1) % 3], vertices[i]}, BS_RIGHT, origin);
+                for (auto res: resStack) {
+                    if (res != nullptr) {
+                        EXPECT_EQ(*res, vertices[(i + 2) % 3])
+                                            << "Wrong solution. At edge: " << "{" << vertices[i] << "},{"
+                                            << vertices[(i + 1) % 3] << "} Seed: " << seed << " Size: "
+                                            << input.size();
+                        if (*res == vertices[(i + 2) % 3]) {
+                            tests_complete++;
+                        } else {
+                            tests_failed++;
+                        }
+                    } else {
+                        EXPECT_TRUE(res) << "No solution found";
+                        tests_nan++;
                     }
-                }else{
-                    EXPECT_TRUE(res) << "No solution found";
-                    tests_nan++;
                 }
             }
         }else{
@@ -69,7 +80,7 @@ void testFindBoundaryKD(long seed, long nPoints){
     auto input = generateInputVec3(nPoints, seed);
 
     //build octree
-    Kd_tree kd_tree(input.begin(),input.end(), Kd_tree::Splitter(1));
+    Kd_tree kd_tree(input.begin(),input.end(), Kd_tree::Splitter(2));
     kd_tree.build();
 
     //build convex hull
