@@ -3,6 +3,7 @@
 //
 #include "gtest/gtest.h"
 #include "tree_scan_helper.h"
+#include "gift_wrapping.h"
 #include "input_generators.h"
 #include "matplot_helper.h"
 
@@ -188,6 +189,57 @@ void testFindBoundaryKD(long seed, long nPoints){
     }
 }
 
+void testFindBoundaryGW(long seed, long nPoints){
+
+    //generate input
+    auto input = generateInputVec3(nPoints, seed);
+
+    //build convex hull
+    Polyhedron_3 poly;
+    CGAL::convex_hull_3(input.begin(), input.end(), poly);
+    long tests_total = 0;
+    long tests_failed = 0;
+    long tests_complete = 0;
+    long tests_nan = 0;
+
+    //iterate over faces
+    for(auto it = poly.facets_begin(); it != poly.facets_end(); it++){
+        auto face_iterator = *it->facet_begin();
+        if(face_iterator.face()->is_triangle()){
+            tests_total += 3;
+            Kernel::Point_3 vertices[3] = {
+                    face_iterator.vertex()->point(),
+                    face_iterator.next()->vertex()->point(),
+                    face_iterator.next()->next()->vertex()->point()
+            };
+            for (int i = 0; i < 3; ++i) {
+                auto resStack = findBoundaryPoint(input, {vertices[(i + 1) % 3],vertices[i]},{vertices[0],vertices[1],vertices[2]});
+                for (auto res:resStack) {
+                    if(res != nullptr){
+                        EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"} Seed: "<< seed << " Size: " <<input.size();
+                        if(*res == vertices[(i+2)%3]){
+                            tests_complete++;
+                        }else{
+                            tests_failed++;
+                        }
+                    }else{
+                        EXPECT_TRUE(res) << "No solution found";
+                        tests_nan++;
+                    }
+                }
+            }
+        }else{
+            EXPECT_TRUE(face_iterator.face()->is_triangle()) << "Face has more than 3 Vertices.";
+        }
+    }
+    if(tests_failed){
+        std::cout << "Total Test:     " << tests_total
+                  << "\nTests Completed:" << tests_complete
+                  << "\nTests Failed:   " << tests_failed
+                  << "\nTests NAN:      " << tests_nan;
+    }
+}
+
 TEST(FindBoundary, C5B1){
     testFindBoundary(1404,5,1);
 }
@@ -266,3 +318,14 @@ TEST(FindBoundaryKD, C10M){
     testFindBoundaryKD(790,10);
 }
 
+TEST(FindBoundaryGW, C500){
+    testFindBoundaryGW(1404,500);
+}TEST(FindBoundaryGW, C5000){
+    testFindBoundaryGW(1404,5000);
+}
+TEST(FindBoundaryGW, C50000){
+    testFindBoundaryGW(1404,50000);
+}
+TEST(FindBoundaryGW, C500000){
+    testFindBoundaryGW(1404,500000);
+}
