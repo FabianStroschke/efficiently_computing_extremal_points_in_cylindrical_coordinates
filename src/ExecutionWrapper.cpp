@@ -102,6 +102,7 @@ void ExecutionWrapper::prepareData() {
     }else{
         data = readInputVec3(path);
     }
+    inputSize = data.size();
 }
 
 std::chrono::nanoseconds ExecutionWrapper::executeQuickhull() {
@@ -114,6 +115,9 @@ std::chrono::nanoseconds ExecutionWrapper::executeQuickhull() {
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
+    outputSize = poly.points().size();
+    datastructureBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - end);
+    convexBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 }
 
@@ -122,10 +126,19 @@ std::chrono::nanoseconds ExecutionWrapper::executeKdMarch() {
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
+    Kd_tree kd_tree(data.begin(),data.end(),Kd_tree::Splitter(2));
+    kd_tree.build();
+
+    std::chrono::steady_clock::time_point endData = std::chrono::steady_clock::now();
+
     Mesh res;
-    KDWrap(data, res);
+    KDWrap(kd_tree, res);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    outputSize = res.vertices().size();
+    datastructureBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endData - begin);
+    convexBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - endData);
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 }
 
@@ -134,10 +147,20 @@ std::chrono::nanoseconds ExecutionWrapper::executeOctreeMarch() {
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
+    Octree octree(data);
+    octree.refine(50, 2);
+
+    std::chrono::steady_clock::time_point endData = std::chrono::steady_clock::now();
+
     Mesh res;
-    octreeWrap(data, res);
+    octreeWrap(octree, res);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    outputSize = res.vertices().size();
+    datastructureBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endData - begin);
+    convexBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - endData);
+
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 }
 
@@ -150,6 +173,10 @@ std::chrono::nanoseconds ExecutionWrapper::executeGiftWrapping() {
     GiftWrap(data, res);
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    outputSize = res.vertices().size();
+    datastructureBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - end);
+    convexBuildTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 }
 
@@ -158,20 +185,22 @@ int main(int argc, char *argv[]) {
     demo.prepareData();
     switch (demo.AType) {
         case Quickhull:
-            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeQuickhull()).count()<< "ms" << std::endl;
+            demo.executeQuickhull();
             break;
         case KdMarch:
-            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeKdMarch()).count()<< "ms"<< std::endl;
+            demo.executeKdMarch();
             break;
         case OctreeMarch:
-            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeOctreeMarch()).count()<< "ms"<< std::endl;
+            demo.executeOctreeMarch();
             break;
         case GiftWrapping:
-            std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(demo.executeGiftWrapping()).count()<< "ms"<< std::endl;
+            demo.executeGiftWrapping();
             break;
         default:
             exit(-1);
     }
+    std::cout << demo.inputSize <<";"<< demo.outputSize <<";"
+              << std::chrono::duration_cast<std::chrono::microseconds>(demo.datastructureBuildTime).count() <<";"
+              << std::chrono::duration_cast<std::chrono::microseconds>(demo.convexBuildTime).count() << std::endl;
 }
-
 

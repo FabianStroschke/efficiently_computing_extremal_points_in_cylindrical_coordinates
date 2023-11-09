@@ -30,6 +30,12 @@ public:
     double dim[3] ={0,0,0};
     std::vector<Kernel::Point_3> data;
 
+    //output data
+    long inputSize = 0;
+    long outputSize = 0;
+    std::chrono::nanoseconds datastructureBuildTime;
+    std::chrono::nanoseconds convexBuildTime;
+
     ExecutionWrapper(int argc, char* argv[]){ readInput(argc,argv);};
     void readInput(int argc, char* argv[]);
     void prepareData();
