@@ -5,24 +5,25 @@
 #include "octree_wrap.h"
 
 void
-octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
-
-    if(pointCloud.empty()) return;
-    bool coplanarFace = false;
-
-    std::vector<Kernel::Point_3> res;
+octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m){
     /** Building the Octree **/
 
     Octree octree(pointCloud);
     octree.refine(50, 2);
 
-    /** Solving the Problem here **/
+}
+
+void
+octreeWrap(Octree &octree, Mesh &m) {
+
+    if(octree.root().empty()) return;
+    bool coplanarFace = false;
 
     std::vector<CGAL::SM_Halfedge_index> borderEdges;
 
     Kernel::Point_3 origin(0,0,0);
-    for(auto &p: pointCloud){
-        origin = {origin.x()+p.x()/pointCloud.size(),origin.y()+p.y()/pointCloud.size(),origin.z()+p.z()/pointCloud.size()};
+    for(auto &p: octree.root()){
+        origin = {origin.x()+p.x()/octree.root().size(),origin.y()+p.y()/octree.root().size(),origin.z()+p.z()/octree.root().size()};
     }
 
     //find first face
@@ -54,13 +55,15 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             std::vector<CGAL::SM_Face_index> faces;
             if(res.size()>1) {
                 coplanarFace = true;
-                long count = 0;
+                /*long count = 0;
                 for (auto p: pointCloud) {
                     if (CGAL::coplanar(t, s, **res.begin(), p)) {
                         count++;
                     }
                 }
                 if (count > res.size() + 2) {
+                    std::cout << "err\n";
+                    exit(1);
                     std::cout<<"_________________________"<<std::endl;
 
                     for (auto p: pointCloud) {
@@ -68,9 +71,9 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(octree, {s, t}, BS_RIGHT, origin);
+                    auto resAlt = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
-                }
+                }*/
 
                 //calc base vectors
                 Point_3 p0 = m.point(m.source(h));
@@ -109,12 +112,14 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             a, b
                     );
                 }
-                if (count > res.size() + 2) {
+                /*if (count > res.size() + 2) {
+                    std::cout << "err\n";
+                    exit(1);
                     std::cout << "..................." << "\n";
                     for (auto pair: map) {
                         std::cout << m.point(pair.second) << "\n";
                     }
-                }
+                }*/
                 //add triangles of Delaunay to mesh
                 for(auto f : T.finite_face_handles()){
                     faces.emplace_back(m.add_face(map[f->vertex(1)],map[f->vertex(0)],map[f->vertex(2)]));
@@ -159,4 +164,5 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     if(coplanarFace){
         //std::cout << "Coplanar | ";
     }
+    //std::cout << m.vertices().size() << ";";
 }

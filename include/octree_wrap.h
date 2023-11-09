@@ -21,5 +21,7 @@ typedef CGAL::Surface_mesh<Kernel::Point_3> Mesh;
 
 void
 octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m);
+void
+octreeWrap(Octree &octree, Mesh &m);
 
 #endif //EXAMPLE_OCTREE_WRAP_H

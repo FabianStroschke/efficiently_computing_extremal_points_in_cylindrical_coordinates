@@ -18,5 +18,7 @@ typedef CGAL::Delaunay_triangulation_2<Kernel>  Triangulation;
 
 void
 KDWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m);
+void
+KDWrap(Kd_tree &kd_tree, Mesh &m);
 
 #endif //EXAMPLE_OCTREE_WRAP_H

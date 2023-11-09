@@ -118,13 +118,15 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             std::vector<CGAL::SM_Face_index> faces;
             if(res.size()>1) {
                 coplanarFace = true;
-                long count = 0;
+                /*long count = 0;
                 for (auto p: pointCloud) {
                     if (CGAL::coplanar(t, s, **res.begin(), p)) {
                         count++;
                     }
                 }
-                /*if (count > res.size() + 2) {
+                if (count > res.size() + 2) {
+                    std::cout << "err\n";
+                    exit(1);
                     std::cout<<"_________________________"<<std::endl;
 
                     for (auto p: pointCloud) {
@@ -132,7 +134,7 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(pointCloud, {t,s}, va,s);
+                    auto resAlt = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
                 }*/
 
@@ -173,12 +175,14 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             a, b
                     );
                 }
-                if (count > res.size() + 2) {
+                /*if (count > res.size() + 2) {
+                    std::cout << "err\n";
+                    exit(1);
                     std::cout << "..................." << "\n";
                     for (auto pair: map) {
                         std::cout << m.point(pair.second) << "\n";
                     }
-                }
+                }*/
                 //add triangles of Delaunay to mesh
                 for(auto f : T.finite_face_handles()){
                     faces.emplace_back(m.add_face(map[f->vertex(1)],map[f->vertex(0)],map[f->vertex(2)]));
@@ -223,4 +227,5 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
     if(coplanarFace){
         //std::cout << "Coplanar | ";
     }
+    //std::cout << m.vertices().size() << ";";
 }
