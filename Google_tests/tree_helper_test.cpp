@@ -47,7 +47,7 @@ void testFindBoundary(long seed, long nPoints, int bucketSize){
                     face_iterator.next()->next()->vertex()->point()
             };
             for (int i = 0; i < 3; ++i) {
-                auto resStack = findBoundaryPoint(octree, {vertices[(i + 1) % 3], vertices[i]}, BS_RIGHT, origin);
+                auto resStack = findExtremalPoint(octree, {vertices[(i + 1) % 3], vertices[i]}, BS_RIGHT, origin);
                 for (auto res: resStack) {
                     if (res != nullptr) {
                         EXPECT_EQ(*res, vertices[(i + 2) % 3])
@@ -108,7 +108,7 @@ void testFindBoundaryKD(long seed, long nPoints){
                     face_iterator.next()->next()->vertex()->point()
             };
             for (int i = 0; i < 3; ++i) {
-                auto resStack = findBoundaryPoint(kd_tree, {vertices[(i + 1) % 3],vertices[i]}, BS_RIGHT, origin);
+                auto resStack = findExtremalPoint(kd_tree, {vertices[(i + 1) % 3], vertices[i]}, BS_RIGHT, origin);
                 for (auto res:resStack) {
                     if(res != nullptr){
                         EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"} Seed: "<< seed << " Size: " <<kd_tree.size();
@@ -213,7 +213,8 @@ void testFindBoundaryGW(long seed, long nPoints){
                     face_iterator.next()->next()->vertex()->point()
             };
             for (int i = 0; i < 3; ++i) {
-                auto resStack = findBoundaryPoint(input, {vertices[(i + 1) % 3],vertices[i]},{vertices[0],vertices[1],vertices[2]});
+                auto resStack = findExtremalPoint(input, {vertices[(i + 1) % 3], vertices[i]},
+                                                  {vertices[0], vertices[1], vertices[2]});
                 for (auto res:resStack) {
                     if(res != nullptr){
                         EXPECT_EQ(*res, vertices[(i+2)%3]) << "Wrong solution. At edge: " << "{" << vertices[i] << "},{" << vertices[(i+1)%3] <<"} Seed: "<< seed << " Size: " <<input.size();

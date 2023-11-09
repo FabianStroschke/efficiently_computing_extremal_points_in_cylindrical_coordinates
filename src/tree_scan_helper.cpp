@@ -95,8 +95,8 @@ int findBoundaryCell(const CGAL::Bbox_3 &bbox, const Kernel::Point_3 &origin, co
     return index;
 }
 
-std::vector<Kernel::Point_3 const*>findBoundaryPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
-                  boundarySide side, Kernel::Point_3 origin){
+std::vector<Kernel::Point_3 const*>findExtremalPoint(const Octree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+                                                     boundarySide side, Kernel::Point_3 origin){
     std::vector<Kernel::Point_3 const *> resStack;
 
     //TODO: extract from findBoundaryCell (?)
@@ -171,7 +171,7 @@ std::vector<Kernel::Point_3 const*>findBoundaryPoint(const Octree &tree, const s
 }
 
 std::vector<Kernel::Point_3 const*>
-findBoundaryPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+findExtremalPoint(const Kd_tree &tree, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   boundarySide side, Kernel::Point_3 origin) {
     std::vector<Kernel::Point_3 const *> resStack;
 

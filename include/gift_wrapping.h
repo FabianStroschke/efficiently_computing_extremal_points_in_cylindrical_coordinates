@@ -17,7 +17,7 @@ typedef CGAL::Delaunay_triangulation_2<Kernel>  Triangulation;
 
 void GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m);
 std::vector<Kernel::Point_3 const*>
-findBoundaryPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+findExtremalPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   Kernel::Plane_3 face);
 
 #endif //EXAMPLE_GIFT_WRAPPING_H

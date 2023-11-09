@@ -55,9 +55,9 @@ int main() {
 
                     Kernel::Point_3 a;
                     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-                    a = **findBoundaryPoint(kd_tree, set1, BS_RIGHT, origin).begin();
-                    a = **findBoundaryPoint(kd_tree, set2, BS_RIGHT, origin).begin();
-                    a = **findBoundaryPoint(kd_tree, set3, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(kd_tree, set1, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(kd_tree, set2, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(kd_tree, set3, BS_RIGHT, origin).begin();
                     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
                     time_kd += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
@@ -86,9 +86,9 @@ int main() {
 
                     Kernel::Point_3 a;
                     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-                    a = **findBoundaryPoint(octree, set1, BS_RIGHT, origin).begin();
-                    a = **findBoundaryPoint(octree, set2, BS_RIGHT, origin).begin();
-                    a = **findBoundaryPoint(octree, set3, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(octree, set1, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(octree, set2, BS_RIGHT, origin).begin();
+                    a = **findExtremalPoint(octree, set3, BS_RIGHT, origin).begin();
                     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
                     time_ot += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
@@ -123,9 +123,9 @@ int main() {
                     Kernel::Point_3 a;
                     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-                    a = **findBoundaryPoint(input, set1,face).begin();
-                    a = **findBoundaryPoint(input, set2,face).begin();
-                    a = **findBoundaryPoint(input, set3,face).begin();
+                    a = **findExtremalPoint(input, set1, face).begin();
+                    a = **findExtremalPoint(input, set2, face).begin();
+                    a = **findExtremalPoint(input, set3, face).begin();
 
                     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 

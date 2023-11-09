@@ -34,8 +34,8 @@ KDWrap(Kd_tree &kd_tree, Mesh &m) {
              {bbox.max_coord(0)*2,bbox.max_coord(1)*2,bbox.max_coord(2)}
             ,{bbox.max_coord(0)*2,bbox.max_coord(1)*2,bbox.min_coord(2)}
     }; //TODO replace with halfedge
-    set.first = **findBoundaryPoint(kd_tree, set, BS_RIGHT, origin).begin();
-    set.second = **findBoundaryPoint(kd_tree, set, BS_RIGHT, origin).begin();
+    set.first = **findExtremalPoint(kd_tree, set, BS_RIGHT, origin).begin();
+    set.second = **findExtremalPoint(kd_tree, set, BS_RIGHT, origin).begin();
 
     //add edge to mesh
     CGAL::SM_Halfedge_index initialEdge = m.add_edge( m.add_vertex(set.second), m.add_vertex(set.first));
@@ -50,7 +50,7 @@ KDWrap(Kd_tree &kd_tree, Mesh &m) {
             auto t = m.point(m.target(h));
             auto s = m.point(m.source(h));
 
-            auto res = findBoundaryPoint(kd_tree, {t,s}, BS_RIGHT, origin);
+            auto res = findExtremalPoint(kd_tree, {t, s}, BS_RIGHT, origin);
 
             if(res.empty()) {//TODO shouldn't happen, throw exception (if it happens s and t arent on the convex hull or the program is broken)
                 continue;
@@ -75,7 +75,7 @@ KDWrap(Kd_tree &kd_tree, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
+                    auto resAlt = findExtremalPoint(kd_tree, {s, t}, BS_RIGHT, origin);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
                 }*/
 

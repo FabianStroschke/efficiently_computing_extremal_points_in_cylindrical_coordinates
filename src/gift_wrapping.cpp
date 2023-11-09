@@ -5,7 +5,7 @@
 #include "gift_wrapping.h"
 
 std::vector<Kernel::Point_3 const*>
-findBoundaryPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
+findExtremalPoint(std::vector<Kernel::Point_3> &pointCloud, const std::pair<Kernel::Point_3, Kernel::Point_3> &fixPointSet,
                   Kernel::Plane_3 face) {
     std::vector<Kernel::Point_3 const *> resStack;
 
@@ -86,10 +86,10 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
             ,{1000000, 100, 0}
     }; //TODO replace with halfedge
 
-    Kernel::Point_3 p3 = **findBoundaryPoint(pointCloud, set, {set.first, set.second, {1000000,0,100}}).begin();
+    Kernel::Point_3 p3 = **findExtremalPoint(pointCloud, set, {set.first, set.second, {1000000, 0, 100}}).begin();
 
-    set.first = **findBoundaryPoint(pointCloud, {p3, set.second}, {p3, set.second, set.first}).begin();
-    set.second = **findBoundaryPoint(pointCloud, {p3, set.first}, {p3,  set.first, set.second}).begin();
+    set.first = **findExtremalPoint(pointCloud, {p3, set.second}, {p3, set.second, set.first}).begin();
+    set.second = **findExtremalPoint(pointCloud, {p3, set.first}, {p3, set.first, set.second}).begin();
 
     //add face to mesh
     for (auto &e: m.halfedges_around_face(m.halfedge(m.add_face(m.add_vertex(set.second), m.add_vertex(set.first),m.add_vertex(p3))))) {
@@ -109,7 +109,8 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                 facePoints.push_back(m.point(vd));
             }
 
-            auto res = findBoundaryPoint(pointCloud, {t,s}, Kernel::Plane_3(facePoints[0],facePoints[1],facePoints[2]));
+            auto res = findExtremalPoint(pointCloud, {t, s},
+                                         Kernel::Plane_3(facePoints[0], facePoints[1], facePoints[2]));
 
             if(res.empty()) {//TODO shouldn't happen, throw exception (if it happens s and t arent on the convex hull or the program is broken)
                 continue;
@@ -134,7 +135,7 @@ GiftWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
+                    auto resAlt = findExtremalPoint(kd_tree, {s, t}, BS_RIGHT, origin);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
                 }*/
 

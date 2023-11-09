@@ -31,8 +31,8 @@ octreeWrap(Octree &octree, Mesh &m) {
     std::pair<Kernel::Point_3,Kernel::Point_3> set = {
             {bbox.xmax()*2,bbox.ymax()*2,bbox.zmax()},
             {bbox.xmax()*2,bbox.ymax()*2,bbox.zmin()}}; //TODO replace with halfedge
-    set.first = **findBoundaryPoint(octree, set, BS_RIGHT, origin).begin();
-    set.second = **findBoundaryPoint(octree, set, BS_RIGHT, origin).begin();
+    set.first = **findExtremalPoint(octree, set, BS_RIGHT, origin).begin();
+    set.second = **findExtremalPoint(octree, set, BS_RIGHT, origin).begin();
 
     //add edge to mesh
     CGAL::SM_Halfedge_index initialEdge = m.add_edge( m.add_vertex(set.second), m.add_vertex(set.first));
@@ -46,7 +46,7 @@ octreeWrap(Octree &octree, Mesh &m) {
             auto t = m.point(m.target(h));
             auto s = m.point(m.source(h));
 
-            auto res = findBoundaryPoint(octree, {t,s}, BS_RIGHT, origin);
+            auto res = findExtremalPoint(octree, {t, s}, BS_RIGHT, origin);
 
             if(res.empty()) {//TODO shouldn't happen, throw exception (if it happens s and t arent on the convex hull or the program is broken)
                 continue;
@@ -71,7 +71,7 @@ octreeWrap(Octree &octree, Mesh &m) {
                             std::cout << p << std::endl;
                         }
                     }
-                    auto resAlt = findBoundaryPoint(kd_tree, {s, t}, BS_RIGHT, origin);
+                    auto resAlt = findExtremalPoint(kd_tree, {s, t}, BS_RIGHT, origin);
                     std::cout << count << "|" << res.size() + 2 << "|" << resAlt.size() << std::endl;
                 }*/
 
