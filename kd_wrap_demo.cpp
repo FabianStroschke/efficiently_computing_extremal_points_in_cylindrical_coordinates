@@ -2,8 +2,6 @@
 // Created by fabia on 14.07.2023.
 //
 
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/convex_hull_3.h>
 #include "kd_wrap.h"
 #include "input_generators.h"
 #include "config.h"
@@ -42,10 +40,8 @@ int main() {
         //input.emplace_back(input.fixPointSet.second);
 
         scatterPoints.addList(input);
-        CGAL::Polyhedron_3<Kernel> poly;
-        CGAL::convex_hull_3(input.begin(), input.end(), poly);
 
-        for(auto &p: poly.points()){
+        for(auto &p: res.points()){
             convexHull.addPoint(p);
         }
         start.addPoint(res.points().begin()[0]);
@@ -70,36 +66,19 @@ int main() {
 
         std::vector<matplotArray> edges;
 
-
-        for (auto e = poly.halfedges_begin(); e != poly.halfedges_end(); e++) {
-            matplotArray edge;
-            edge.addPoint(e->vertex()->point());
-            edge.addPoint(e->prev()->vertex()->point());
-
-            edges.push_back(edge);
-            plt::plot3(edges.back().x, edges.back().y, edges.back().z, {{"linewidth", "0.5"},
-                                                                        {"color",     "c"}}, 1);
-        }
-        /*for (auto e = res.halfedges_begin(); e != res.halfedges_end(); e++) {
+        for (auto e = res.halfedges_begin(); e != res.halfedges_end(); e++) {
             matplotArray edge;
             edge.addPoint(res.points()[res.target(*e)]);
             edge.addPoint(res.points()[res.source(*e)]);
             edges.push_back(edge);
             plt::plot3(edges.back().x, edges.back().y, edges.back().z, {{"linewidth", "0.5"},
                                                                         {"color",     "c"}}, 1);
-        }*/
+        }
 
         Kd_tree kd_tree(input.begin(),input.end(),Kd_tree::Splitter(1));
         kd_tree.build();
-        matplotKDtree treeBoxes(kd_tree);
-        treeBoxes.show();
-
-
-        Kernel::Point_3 origin(0,0,0);
-        for(auto &p: kd_tree){
-            origin = {origin.x()+p.x()/kd_tree.size(),origin.y()+p.y()/kd_tree.size(),origin.z()+p.z()/kd_tree.size()};
-        }
-
+        //matplotKDtree treeBoxes(kd_tree);
+        //treeBoxes.show();
 
         plt::show();
     }
