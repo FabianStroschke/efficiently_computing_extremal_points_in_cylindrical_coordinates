@@ -150,7 +150,7 @@ KDWrap(Kd_tree &kd_tree, Mesh &m) {
 
                     std::cout << "______________\n";
 
-                    for(auto &face: m.faces()){
+                    for(auto face: m.faces()){
                         for(auto &half: m.halfedges_around_face(m.halfedge(face))) {
                             std::cout << m.target(half) << "|" ;
                         }
