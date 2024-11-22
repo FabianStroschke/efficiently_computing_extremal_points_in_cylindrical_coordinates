@@ -10,7 +10,7 @@ octreeWrap(std::vector<Kernel::Point_3> &pointCloud, Mesh &m){
 
     Octree octree(pointCloud);
     octree.refine(50, 2);
-
+    octreeWrap(octree, m);
 }
 
 void
