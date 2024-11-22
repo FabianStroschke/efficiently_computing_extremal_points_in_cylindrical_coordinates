@@ -8,13 +8,6 @@ project(WIP)
 # add include dir
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-#include matplotlib
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/matplotlibcpp")
-
-# find python libraries
-find_package(Python 3.7 EXACT COMPONENTS Interpreter Development NumPy REQUIRED)
-include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
-
 #add CGAL
 find_package(CGAL REQUIRED COMPONENTS Core)
 
@@ -27,23 +20,11 @@ add_executable(compare compare.cpp src/input_generators.cpp src/tree_scan_helper
 
 #link quickhull
 target_link_libraries(quickhull CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(quickhull
-        Python::Python
-        Python::Module
-        Python::NumPy
-        )
+
 target_link_libraries(octreeWrap CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(octreeWrap
-        Python::Python
-        Python::Module
-        Python::NumPy
-        )
+
 target_link_libraries(KDWrap CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(KDWrap
-        Python::Python
-        Python::Module
-        Python::NumPy
-        )
+
 
 target_link_libraries(demo CGAL::CGAL CGAL::CGAL_Core)
 target_link_libraries(compare CGAL::CGAL CGAL::CGAL_Core)

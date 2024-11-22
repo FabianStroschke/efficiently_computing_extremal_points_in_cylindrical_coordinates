@@ -5,7 +5,6 @@
 #include "tree_scan_helper.h"
 #include "gift_wrapping.h"
 #include "input_generators.h"
-#include "matplot_helper.h"
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/convex_hull_3.h>
@@ -116,60 +115,6 @@ void testFindBoundaryKD(long seed, long nPoints){
                             tests_complete++;
                         }else{
                             tests_failed++;
-                            /*Kernel::Plane_3 p1(vertices[i],vertices[(i+1)%3],vertices[(i+2)%3]);
-                            Kernel::Plane_3 p2(vertices[i],vertices[(i+1)%3],*res);
-                            std::cout << "Angle:     " << acos((p1.orthogonal_vector()*p2.orthogonal_vector())
-                                /(sqrt(p1.orthogonal_vector().squared_length())*sqrt(p2.orthogonal_vector().squared_length())));*/
-                            matplotArray scatterPoints;
-                            matplotArray convexHull;
-
-                            //input.emplace_back(input.fixPointSet.first);
-                            //input.emplace_back(input.fixPointSet.second);
-
-                            scatterPoints.addList(input);
-                            CGAL::Polyhedron_3<Kernel> poly;
-                            CGAL::convex_hull_3(input.begin(), input.end(), poly);
-
-                            for(auto &p: poly.points()){
-                                convexHull.addPoint(p);
-                            }
-
-                            matplotArray tri;
-                            matplotArray triFalse;
-                            tri.addPoint(vertices[0]);
-                            tri.addPoint(vertices[1]);
-                            tri.addPoint(vertices[2]);
-                            tri.addPoint(vertices[0]);
-
-                            triFalse.addPoint(vertices[i]);
-                            triFalse.addPoint(*res);
-                            triFalse.addPoint(vertices[(i + 1) % 3]);
-                            triFalse.addPoint(vertices[i]);
-
-                            plt::figure(1);
-                            plt::clf();
-
-                            plt::plot3(tri.x, tri.y, tri.z, {{"linewidth",  "0.2"},
-                                                             {"marker",     "o"},
-                                                             {"markersize", "0.0"},
-                                                             {"color",      "g"}}, 1);
-
-                            plt::plot3(triFalse.x, triFalse.y, triFalse.z, {{"linewidth",  "0.2"},
-                                                                            {"marker",     "o"},
-                                                                            {"markersize", "0.0"},
-                                                                            {"color",      "r"}}, 1);
-
-                            /*plt::plot3(scatterPoints.x, scatterPoints.y, scatterPoints.z, {{"linewidth",  "0.0"},
-                                                                                           {"marker",     "x"},
-                                                                                           {"markersize", "2.5"}}, 1);
-    */
-                            plt::plot3(convexHull.x, convexHull.y, convexHull.z, {{"linewidth",  "0.0"},
-                                                                                  {"marker",     "x"},
-                                                                                  {"markersize", "2.5"},
-                                                                                  {"color",      "r"}}, 1);
-                            plt::show();
-
-
                         }
                     }else{
                         EXPECT_TRUE(res) << "No solution found";

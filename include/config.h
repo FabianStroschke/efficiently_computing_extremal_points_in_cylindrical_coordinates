@@ -10,6 +10,5 @@
 
 int sample_size = 10000000;
 int seed = 12345;//std::random_device{}();
-bool MatPlotShow = false;
 
 #endif //EXAMPLE_CONFIG_H
