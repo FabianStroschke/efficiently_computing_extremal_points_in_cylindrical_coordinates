@@ -31,7 +31,7 @@ int main() {
             CGAL::convex_hull_3(input.begin(), input.end(), poly);
 
             //test for kd_trees
-            Kd_tree kd_tree(input.begin(), input.end(), Kd_tree::Splitter(10));
+            Kd_tree kd_tree(input.begin(), input.end(), Kd_tree::Splitter(20));
             kd_tree.build();
             Kernel::Point_3 origin(0, 0, 0);
             for (auto &p: kd_tree) {
@@ -67,7 +67,7 @@ int main() {
 
             //test for octrees
             Octree octree(input);
-            octree.refine(50, 10);
+            octree.refine(50, 20);
 
             count_faces = 0;
             for(auto it = poly.facets_begin(); it != poly.facets_end() and max_faces>=count_faces; it++){
@@ -141,7 +141,16 @@ int main() {
     };
 
     //generate input
-    for (int i = 100; i < 10000000; i = i * 2) {
+    for (int i = 100; i < 1000; i = i * 2) {
+        foo(i,46854321);
+    }
+    for (int i = 1000; i < 10000; i = i * 2) {
+        foo(i,46854321);
+    }
+    for (int i = 10000; i < 100000; i = i * 2) {
+        foo(i,46854321);
+    }
+    for (int i = 100000; i < 1000000; i = i * 2) {
         foo(i,46854321);
     }
 }
