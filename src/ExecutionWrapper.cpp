@@ -61,22 +61,63 @@ void ExecutionWrapper::readInput(int argc, char* argv[]){
                 }
             }
         }else if(argv[i] == std::string("-?") or argv[i] == std::string("?") or argv[i] == std::string("-help")){
-                std::cerr << "Help Text\n";
+                std::cerr << "Result: <n>;<h>;<t1>;<t2>\n"
+                             "\tn: Number of Points\n"
+                             "\th: Number of points on the Convex Hull\n"
+                             "\tt1: Time to build data structure in mirco seconds\n"
+                             "\tt2: Time to calculate Convex Hull in mirco seconds\n\n"
+                             "How to use: \n\n"
+                             "-QH\n"
+                             "\tUse Quickhull as algorithm\n"
+                             "\n"
+                             "-OT\n"
+                             "\tUse OctreeWrap as algorithm\n"
+                             "\n"
+                             "-KD\n"
+                             "\tUse KDWrap as algorithm\n"
+                             "\n"
+                             "-GW\n"
+                             "\tUse Gift-wrapping as algorithm\n"
+                             "\n"
+                             "-path\n"
+                             "\tPath to a file that contains a point cloud\n"
+                             "\n"
+                             "-seed <integer>\n"
+                             "\tSeed for generation of a random point cloud\n"
+                             "\n"
+                             "-size <integer>\n"
+                             "\tHow many points will be generated\n"
+                             "\n"
+                             "-dim <x> <y> <z>\n"
+                             "\tThe maximum distance between 2 points along one axis\n"
+                             "\tStandard dimensions x=100, y=100 z=100\n"
+                             "\n"
+                             "-shape <options below>\n"
+                             "\tOptions: BoxFull, BoxSurface, SphereFull, SphereSurface\n"
+                             "\tBoxFull, SphereFull: \n"
+                             "\t\tGenerate points on the surface and the inside of the shape\n"
+                             "\tBoxSurface, SphereSurface: \n"
+                             "\t\tGenerate points only on the surface the shape \n"
+                             "\tInfo:\n"
+                             "\t\tWith 'SphereSurface' all point become part of the convex hull\n"
+                             "\t\tWith 'BoxSurface' points form faces with many coplanar points\n"
+                             "\n"
+                             "Example use: -seed 1234567 -OT -size 100000 -shape SphereFull";
                 exit(-1);
         }
     }
 
     //all parameters processed
     if(not seed and path.empty()){
-        std::cerr << "seed or path required\n";
+        std::cerr << "seed or path required. Use ?, -? or -help for more info\n";
         exit(-1);
     }
     if(seed and not path.empty()){
-        std::cerr << "seed and path cant be set at the same time\n";
+        std::cerr << "seed and path cant be set at the same time. Use ?, -? or -help for more info\n";
         exit(-1);
     }
     if(AType == NoAlgorithm){
-        std::cerr << "No algorithm specified. Choose between: -QH, -KD or -OT\n";
+        std::cerr << "No algorithm specified. Choose between: -QH, -OT, -KD or -GW. Use ?, -? or -help for more info\n";
         exit(-1);
     }
     if(seed){
@@ -90,7 +131,7 @@ void ExecutionWrapper::readInput(int argc, char* argv[]){
             dim[2] = 100;
         }
         if(shape == NoShape){
-            std::cerr << "No shape specified. Choose between: BoxFull, BoxSurface, SphereFull, SphereSurface\n";
+            std::cerr << "No shape specified. Choose between: BoxFull, BoxSurface, SphereFull, SphereSurface. Use ?, -? or -help for more info\n";
             exit(-1);
         }
     }
