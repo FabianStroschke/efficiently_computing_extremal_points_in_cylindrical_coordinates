@@ -19,21 +19,21 @@ include_directories(${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
 find_package(CGAL REQUIRED COMPONENTS Core)
 
 # add executables
-add_executable(quickhull quickhull.cpp src/input_generators.cpp)
-add_executable(octreeWrap octree_gift_wrapping.cpp src/input_generators.cpp src/tree_scan_helper.cpp src/octree_wrap.cpp)
+add_executable(Quickhull quickhull.cpp src/input_generators.cpp)
+add_executable(OctreeWrap octree_gift_wrapping.cpp src/input_generators.cpp src/tree_scan_helper.cpp src/octree_wrap.cpp)
 add_executable(KDWrap kd_wrap_demo.cpp src/input_generators.cpp src/tree_scan_helper.cpp src/kd_wrap.cpp)
 add_executable(demo src/ExecutionWrapper.cpp src/input_generators.cpp src/tree_scan_helper.cpp src/octree_wrap.cpp src/kd_wrap.cpp src/gift_wrapping.cpp)
 add_executable(compare compare.cpp src/input_generators.cpp src/tree_scan_helper.cpp src/octree_wrap.cpp src/kd_wrap.cpp src/gift_wrapping.cpp)
 
-#link quickhull
-target_link_libraries(quickhull CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(quickhull
+#link Quickhull
+target_link_libraries(Quickhull CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(Quickhull
         Python::Python
         Python::Module
         Python::NumPy
         )
-target_link_libraries(octreeWrap CGAL::CGAL CGAL::CGAL_Core)
-target_link_libraries(octreeWrap
+target_link_libraries(OctreeWrap CGAL::CGAL CGAL::CGAL_Core)
+target_link_libraries(OctreeWrap
         Python::Python
         Python::Module
         Python::NumPy
