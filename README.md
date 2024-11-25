@@ -1,2 +1,11 @@
-- Matplotlib.pyplot not found error: check that the Pyton version is <3.8?
-- editing the "sccatter plot" see these keywords:https://matplotlib.org/2.1.2/api/_as_gen/matplotlib.pyplot.plot.html
+# Efficiently computing extremal points in cylindrical coordinates
+This project was created as part of a Bachelorthesis. The thesis was about efficiently computing extremal points 
+using spatial datastructures. The algorithm for extremal points was then used to calculate
+the convex hull to demonstrate and evaluate the approach. For a more detailed
+description see [this documentation Website (in German)](https://fabianstroschke.github.io/finding_extremal_points_in_3D/)
+
+## Author
+Fabian Stroschke, former student at Technische Universität Berlin
+
+## Links
+[Documentation](https://fabianstroschke.github.io/finding_extremal_points_in_3D/)

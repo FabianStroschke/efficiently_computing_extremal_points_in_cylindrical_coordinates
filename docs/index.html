@@ -1,0 +1,270 @@
+<!doctype html><html class="no-js"><head><meta charset="utf-8"><title>Efficiently computing extremal points in cylindrical coordinates</title><meta name="description" content=""><meta name="viewport" content="width=device-width">
+<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+<link href="http://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        <!--<link rel="stylesheet" href="styles/main.37ab405b.css">-->
+<body>
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an 
+    <strong>outdated</strong> browser. Please 
+    <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+</p>
+<![endif]-->
+<div class="container">
+
+    <nav class="navbar">
+        <div class="container">
+            <ul class="navbar-list">
+                <li class="navbar-item">
+                    <a class="navbar-link" href="#Titel">Titel</a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" href="#Zusammenfassung">Zusammenfassung</a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" href="#Ergebnisse">Ergebnisse</a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" href="#Bachelorarbeit">Bachelorarbeit</a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" href="#Gebrauchsanleitung">Gebrauchsanleitung</a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <section class="header" id="Titel">
+        <h2 class="title">Efficiently computing extremal points in cylindrical coordinates</h2>
+        <h6>Project by Fabian Stroschke (<a href="https://github.com/FabianStroschke/efficiently_computing_extremal_points_in_cylindrical_coordinates">Github</a>)
+        </h6>
+
+        <div class="row">
+            <p>
+                Diese Arbeit untersucht die Verwendung von räumlichen Datenstrukturen zur effizienten Bestimmung von Extremalpunkten in Punktmengen.
+                Die effiziente Bestimmung der Extremalpunkte wurde dann dafür genutzt, um eine effizientere Version des Gift-Wrapping Algorithmus zu entwickeln.
+            </p>
+            <p>
+                Auf dieser Seite befindet sich nur eine kurze Übersicht der Arbeit, für eine detaillierte Ausführung des Themas ist die Arbeit weiter unten integriert.
+                Sollte sie nicht angezeigt werden, kann sie aus dem 'docs' Ordner der Repositories heruntergeladen werden.
+            </p>
+        </div>
+    </section>
+
+    <div class="docs-section" id="Zusammenfassung">
+        <h3 class="section-heading">Zusammenfassung</h3>
+        <p>
+            Das Finden von Extremalpunkten kann benutzt werden, um viele verschiedene Probleme
+            zu lösen. Bekannte Beispiele dafür sind die Berechnung von konvexen Hüllen und die
+            lineare Optimierung. Beide Probleme wurden in der Vergangenheit schon viel untersucht
+            und wurden sehr gut optimiert. Das Finden einzelner Extremalpunkte zu beschleunigen
+            wurde hingegen in weniger ausführlich betrachtet.
+        </p>
+        <p>
+            In dieser Arbeit wurde untersucht, wie Extremalpunkte effizient berechnet werden können, wenn eine Linie oder Ebene um eine Achse rotiert wird, bis sie einen Extremalpunkt
+            trifft. Da dieses Problem für unsortierte Punkte nicht schneller als in O(n) gelöst werden
+            kann, wurde dafür angenommen, dass die Punkte bereits in einer räumlichen Datenstruktur gegeben sind. Auf diese Weise wurde ein Algorithmus entwickelt, welcher die
+            Eigenschaften dieser Datenstrukturen nutzt, um die Extremalpunkte effizient zu berechnen und mit minimalen Änderungen für viele verschiedene räumliche Datenstrukturen
+            genutzt werden kann. Im schlimmsten Fall hat dieser Algorithmus eine Laufzeit von O(n),
+            es konnte aber empirisch gezeigt werden, dass er im Durchschnitt deutlich schneller ist
+            und sogar Laufzeiten von O(√n) erreichen kann.
+        </p>
+        <p>
+            Da das Bestimmen von Extremalpunkten durch Rotation nahezu identisch mit einem
+            Teil des Gift Wrapping Algorithmus ist, wurde auf dieser Basis auch eine modifizierte
+            Version des Gift Wrapping Algorithmus entwickelt, um zu zeigen, wofür die Berechnung
+            von Extremalpunkten genutzt werden kann. Diese Modifizierung von Gift Wrapping ist
+            deutlich schneller als der normale Gift-Wrapping Algorithmus, hat eine bessere empirische
+            Laufzeit als andere neue Modifikationen von Gift Wrapping und ist in manchen Fällen
+            sogar schneller als der Quickhull Algorithmus.
+
+        </p>
+    </div>
+
+    <div class="docs-section" id="Ergebnisse">
+        <h3 class="section-heading">Ergebnisse</h3>
+        <div class="row">
+            <div class="one-half column category" style="text-align: center;">
+                <img class="u-max-full-width" src="images/runtime_sphere_full.png">
+                <p>Laufzeiten (in Sekunden), um die konvexe Hülle zu berechnen, wenn die
+                    Punkte in einer Kugel verteilt sind. </p>
+            </div>
+            <div class="one-half column category" style="text-align: center;">
+                <img class="u-max-full-width" src="images/runtime_sphere_surface.png">
+                <p>Laufzeiten (in Sekunden), um die konvexe Hülle zu berechnen, wenn die
+                    Punkte auf der Oberfläche einer Kugel verteilt sind. Gift Wrapping wurde nur bis 2500k
+                    Punkte getestet.</p>
+            </div>
+        </div>
+        <p>
+            Die Algorithmen für konvexe Hüllen haben keine optimale asymptotische
+            Laufzeit, sind aber deutlich schneller als Gift Warpping und könnten deshalb in Anwendungen benutzt werden, wo die Benutzung von Gift Wrapping sinnvoll ist oder wo Teile
+            der konvexen Hülle schnell berechnet werden sollen. Wenn das Verhältnis von h zu n
+            sehr klein ist, könnten die hier vorgestellten Algorithmen auch statt Quickhull genutzt
+            werden, um eine bessere Laufzeit zu erreichen.
+        </p>
+        <p>
+            Die hier entwickelten Algorithmen sind noch nicht optimal und können noch in vielen
+            Aspekten verbessert werden. Sie sollen vor allem demonstrieren, dass Algorithmen wie Gift-Wrapping auf diese Weise optimiert werden können.
+        </p>
+    </div>
+
+    <div class="docs-section" id="Bachelorarbeit">
+        <h3 class="section-heading">Bachelorarbeit</h3>
+        <embed src="Abschlussarbeit_watermarked.pdf" width="100%" style="aspect-ratio: 0.81 ;"
+               type="application/pdf">
+    </div>
+
+
+    <div class="docs-section" id="Gebrauchsanleitung">
+        <h3 class="section-heading">Gebrauchsanleitung</h3>
+        <h5>1. Anforderungen</h5>
+        <p>
+            Benötigt:
+        </p>
+        <ul>
+            <li>GCC / G++</li>
+            <li>CMAKE</li>
+            <li><a href="https://www.cgal.org/download.html">CGAL</a></li>
+            <li>Python 3.8
+                <ul>
+                    <li>MatplotlibCPP funktioniert mit 3.9+ möglicherweise nicht richtig</li>
+                    <li>Sollte Python nicht richtig funktionieren/gefunden werden (z.B. "Matplotlib.pyplot not found error"),
+                        gibt es bei Github einen Branch der kein Python benötigt. </li>
+                </ul>
+            </li>
+        </ul>
+
+        <p>Die Algorithmen können auf <b>Windows</b> und <b>Linux</b> kompiliert und ausgeführt werden. </p>
+
+        <h4>2. Konfiguration</h4>
+        <h5>include/config.h</h5>
+        <p>Für die konfiguration von 'KDWrap', 'OctreeWrap' und 'Quickhull'. Beeinflusst nicht die parameter von 'demo'. <b>Algorithmen müssen zum Anwenden neu kompiliert werden.</b></p>
+
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Attribut Name</th>
+                <th></th>
+                <th>Beschreibung</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>"sample_size":</code></td>
+                <td></td>
+                <td>Anzahl der generierten Punkte.</td>
+            </tr>
+            <tr>
+                <td><code>"seed":</code></td>
+                <td></td>
+                <td>Start Seed für die Generierung der zufälligen Punkte.</td>
+            </tr>
+            <tr>
+                <td><code>"MatPlotShow":</code></td>
+                <td></td>
+                <td>Zeigt Punkte, Startpunkte, Extremalpunkte und Konvexe Hülle (mit Quickhull erzeugt, um Extremalpunkte auf Fehler zu überprüfen) an.</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h5>Command-line Argumente für 'demo'</h5>
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Attribut Name</th>
+                <th></th>
+                <th>Beschreibung</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>"?","-?","-help":</code></td>
+                <td></td>
+                <td>Zeigt eine Beschreibung der Befehle im Terminal an.</td>
+            </tr>
+            <tr>
+                <td><code>"-QH":</code></td>
+                <td></td>
+                <td> Quickhull wird als Algorithmus benutzt.</td>
+            </tr>
+            <tr>
+                <td><code>"-OT":</code></td>
+                <td></td>
+                <td> OctreeWrap wird als Algorithmus benutzt.</td>
+            </tr>
+            <tr>
+                <td><code>"-KD":</code></td>
+                <td></td>
+                <td> KDWrap wird als Algorithmus benutzt.</td>
+            </tr>
+            <tr>
+                <td><code>"-GW":</code></td>
+                <td></td>
+                <td> Gift-wrapping wird als Algorithmus benutzt.</td>
+            </tr>
+            <tr>
+                <td><code>"-path [string]":</code></td>
+                <td></td>
+                <td>Pfad zu einer Datei die eine Punktwolke enthält. Siehe <a href=https://doc.cgal.org/latest/Stream_support/group__IOstreamFunctions.html#gaafb0e02f4669802c727709743065804c>read_polygon_soup</a> </td>
+            </tr>
+            <tr>
+                <td><code>"-seed [integer]":</code></td>
+                <td></td>
+                <td>Start Seed für die Generierung der zufälligen Punkte. Kann nicht zusammen mit '-path' benutzt werden.</td>
+            </tr>
+            <tr>
+                <td><code>"-size [integer]":</code></td>
+                <td></td>
+                <td>Anzahl der Punkte die generiert werden sollen, wenn '-seed' benutzt wird.</td>
+            </tr>
+
+            <tr>
+                <td><code>"-dim [x] [y] [z]":</code></td>
+                <td></td>
+                <td>Maximale Distanz zwischen 2 Punkten entlang einer Achse. Standard Dimensionen x=100, y=100 z=100</td>
+            </tr>
+            <tr>
+                <td rowspan="5" style="vertical-align: top;"><code>"-shape [Option]"</code></td>
+                <td></td>
+                <td>Eine der unten gelisteten Optionen muss für die Punktgenerierung gewählt werden.</td>
+            </tr>
+            <tr>
+                <td class="spanned"><code>"BoxFull":</code></td>
+                <td>Alle Punkte werden innerhalb eines Quaders generiert.</td>
+            </tr>
+            <tr>
+                <td class="spanned"><code>"BoxSurface":</code></td>
+                <td>Alle Punkte werden auf der Oberfläche eines Quaders generiert. (Es entstehen viele coplanare Punkte, welche bei Gift-wrapping, KDWrap und OctreeWrap zu Artefakten führen kann.)</td>
+            </tr>
+            <tr>
+                <td class="spanned"><code>"SphereFull":</code></td>
+                <td>Alle Punkte werden innerhalb einer Kugel generiert.</td>
+            </tr>
+            <tr>
+                <td class="spanned"><code>"SphereSurface":</code></td>
+                <td>Alle Punkte werden auf der Oberfläche einer Kugel generiert. (Alle Punkte sind Teil der konvexen Hülle.)</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h4>3. Ausführen</h4>
+        <h5>KDWrap, OctreeWarp, Quickhull:</h5>
+        <p>Ausführen über IDE oder Command-line ohne Argumente. Beispiel <code>./KDWrap</code></p>
+        <p>Nach Ausführung wird die benötigte Zeit und der Seed angezeigt.</p>
+
+        <h5>demo:</h5>
+        <p>Ausführen über IDE oder Command-line mit Argumenten. Beispiel <code>./demo -seed 1234567 -OT -size 100000 -shape SphereFull</code></p>
+        <p>Nach Ausführung werden die Ergebnisse im Format "[n];[h];[t1];[t2]" angezeigt.
+            <br>[n]: Anzahl der Punkte
+            <br>[h]: Anzahl der Punkte auf der konvexen Hülle
+            <br>[t1]: Zeit die benötigt wurde, um die Datenstruktur zu bauen, in Microsekunden
+            <br>[t2]: Zeit die benötigt wurde, um die konvexe Hülle zu berechnen, in Microsekunden</p>
+
+    </div>
+
+</div>
+
