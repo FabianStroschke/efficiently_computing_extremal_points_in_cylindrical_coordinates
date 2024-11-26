@@ -61,7 +61,7 @@
             zu lösen. Bekannte Beispiele dafür sind die Berechnung von konvexen Hüllen und die
             lineare Optimierung. Beide Probleme wurden in der Vergangenheit schon viel untersucht
             und wurden sehr gut optimiert. Das Finden einzelner Extremalpunkte zu beschleunigen
-            wurde hingegen in weniger ausführlich betrachtet.
+            wurde hingegen weniger ausführlich betrachtet.
         </p>
         <p>
             In dieser Arbeit wurde untersucht, wie Extremalpunkte effizient berechnet werden können, wenn eine Linie oder Ebene um eine Achse rotiert wird, bis sie einen Extremalpunkt
@@ -74,11 +74,11 @@
         </p>
         <p>
             Da das Bestimmen von Extremalpunkten durch Rotation nahezu identisch mit einem
-            Teil des Gift Wrapping Algorithmus ist, wurde auf dieser Basis auch eine modifizierte
-            Version des Gift Wrapping Algorithmus entwickelt, um zu zeigen, wofür die Berechnung
-            von Extremalpunkten genutzt werden kann. Diese Modifizierung von Gift Wrapping ist
+            Teil des Gift-Wrapping Algorithmus ist, wurde auf dieser Basis auch eine modifizierte
+            Version des Gift-Wrapping Algorithmus entwickelt, um zu zeigen, wofür die Berechnung
+            von Extremalpunkten genutzt werden kann. Diese Modifizierung von Gift-Wrapping ist
             deutlich schneller als der normale Gift-Wrapping Algorithmus, hat eine bessere empirische
-            Laufzeit als andere neue Modifikationen von Gift Wrapping und ist in manchen Fällen
+            Laufzeit als andere neue Modifikationen von Gift-Wrapping und ist in manchen Fällen
             sogar schneller als der Quickhull Algorithmus.
 
         </p>
@@ -95,13 +95,13 @@
             <div class="one-half column category" style="text-align: center;">
                 <img class="u-max-full-width" src="images/runtime_sphere_surface.png">
                 <p>Laufzeiten (in Sekunden), um die konvexe Hülle zu berechnen, wenn die
-                    Punkte auf der Oberfläche einer Kugel verteilt sind. Gift Wrapping wurde nur bis 2500k
+                    Punkte auf der Oberfläche einer Kugel verteilt sind. Gift-Wrapping wurde nur bis 2500k
                     Punkte getestet.</p>
             </div>
         </div>
         <p>
             Die Algorithmen für konvexe Hüllen haben keine optimale asymptotische
-            Laufzeit, sind aber deutlich schneller als Gift Warpping und könnten deshalb in Anwendungen benutzt werden, wo die Benutzung von Gift Wrapping sinnvoll ist oder wo Teile
+            Laufzeit, sind aber deutlich schneller als Gift-Wrapping und könnten deshalb in Anwendungen benutzt werden, wo die Benutzung von Gift-Wrapping sinnvoll ist oder wo Teile
             der konvexen Hülle schnell berechnet werden sollen. Wenn das Verhältnis von h zu n
             sehr klein ist, könnten die hier vorgestellten Algorithmen auch statt Quickhull genutzt
             werden, um eine bessere Laufzeit zu erreichen.
